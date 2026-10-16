@@ -1,0 +1,30 @@
+<!-- TODO: header del mockup (città "Vicenza", icona profilo, menu) -> andrà nella navbar -->
+<div>
+    <header>
+        <h1>Feed</h1>
+        <a routerLink="/segnalazione">+ Nuova segnalazione</a>
+    </header>
+
+    @if (errorMessage()) {
+    <div role="alert">
+        <p>{{ errorMessage() }}</p>
+        <button type="button" (click)="ricarica()">Riprova</button>
+    </div>
+    }
+
+    @let segnalazioni = segnalazioni$ | async;
+    @if (segnalazioni) {
+    <div>
+        @for (segnalazione of segnalazioni; track segnalazione.id) {
+        <app-segnalazione-card [segnalazione]="segnalazione" (onDetail)="navigateToDetail(segnalazione.id)"
+            (onPartecipi)="partecipi(segnalazione.id)" />
+        } @empty {
+        @if (!errorMessage()) {
+        <p>Nessuna segnalazione per ora.</p>
+        }
+        }
+    </div>
+    } @else {
+    <p>Caricamento...</p>
+    }
+</div>

@@ -25,6 +25,12 @@ export class SegnalazioneService {
     // Il proxy.conf.json inoltra /api verso il back
     private baseUrl = '/api/segnalazioni';
 
+    // Lista per il feed. CONTRATTO CON IL BACK (da concordare col team): GET /api/segnalazioni
+    // restituisce Segnalazione[] già con le "immagini" dentro, ordinate dalla più recente.
+    find() {
+        return this.http.get<Segnalazione[]>(this.baseUrl);
+    }
+
     // CONTRATTO CON IL BACK (da concordare col team): multipart/form-data con i campi
     // titolo, descrizione?, latitudine, longitudine, foto (file).
     // Il back valida il file, lo converte/salva e scrive l'url in segnalazione_immagini.

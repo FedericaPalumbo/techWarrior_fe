@@ -1,0 +1,12 @@
+<article tabindex="0" (click)="goToDetail()" (keydown.enter)="goToDetail()">
+    <h2>{{ segnalazione().titolo }}</h2>
+
+    @if (immagine(); as src) {
+    <img [src]="src" [alt]="segnalazione().titolo">
+    }
+
+    <p>{{ dettagli() }}</p>
+
+    <!-- TODO: da collegare quando il back avrà l'endpoint per dare la disponibilità come volontario -->
+    <button type="button" (click)="partecipi($event)">Partecipi ?</button>
+</article>
