@@ -48,59 +48,68 @@
                             {
                                 "glob": "**/*",
                                 "input": "public"
+                            },
+                            {
+                                "glob": "**/*",
+                                "input": "node_modules/leaflet/dist/images",
+                                "output": "/assets/leaflet/"
                             }
                         ],
-                        "styles": [
-                            "node_modules/bootstrap/dist/css/bootstrap.min.css",
-                            "src/styles.css"
+                    ],
+                    "styles": [
+                        "node_modules/bootstrap/dist/css/bootstrap.min.css",
+                        "node_modules/leaflet/dist/leaflet.css",
+                        "node_modules/leaflet.markercluster/dist/MarkerCluster.css",
+                        "node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css",
+                        "src/styles.css"
+                    ],
+                    "polyfills": [
+                        "@angular/localize/init"
+                    ]
+                },
+                "configurations": {
+                    "production": {
+                        "budgets": [
+                            {
+                                "type": "initial",
+                                "maximumWarning": "500kB",
+                                "maximumError": "1MB"
+                            },
+                            {
+                                "type": "anyComponentStyle",
+                                "maximumWarning": "4kB",
+                                "maximumError": "8kB"
+                            }
                         ],
-                        "polyfills": [
-                            "@angular/localize/init"
-                        ]
+                        "outputHashing": "all"
                     },
-                    "configurations": {
-                        "production": {
-                            "budgets": [
-                                {
-                                    "type": "initial",
-                                    "maximumWarning": "500kB",
-                                    "maximumError": "1MB"
-                                },
-                                {
-                                    "type": "anyComponentStyle",
-                                    "maximumWarning": "4kB",
-                                    "maximumError": "8kB"
-                                }
-                            ],
-                            "outputHashing": "all"
-                        },
-                        "development": {
-                            "optimization": false,
-                            "extractLicenses": false,
-                            "sourceMap": true
-                        }
-                    },
-                    "defaultConfiguration": "production"
+                    "development": {
+                        "optimization": false,
+                        "extractLicenses": false,
+                        "sourceMap": true
+                    }
                 },
-                "serve": {
-                    "builder": "@angular/build:dev-server",
-                    "options": {
-                        "proxyConfig": "proxy.conf.json"
-                    },
-                    "configurations": {
-                        "production": {
-                            "buildTarget": "tech-warrior-fe:build:production"
-                        },
-                        "development": {
-                            "buildTarget": "tech-warrior-fe:build:development"
-                        }
-                    },
-                    "defaultConfiguration": "development"
+                "defaultConfiguration": "production"
+            },
+            "serve": {
+                "builder": "@angular/build:dev-server",
+                "options": {
+                    "proxyConfig": "proxy.conf.json"
                 },
-                "test": {
-                    "builder": "@angular/build:unit-test"
-                }
+                "configurations": {
+                    "production": {
+                        "buildTarget": "tech-warrior-fe:build:production"
+                    },
+                    "development": {
+                        "buildTarget": "tech-warrior-fe:build:development"
+                    }
+                },
+                "defaultConfiguration": "development"
+            },
+            "test": {
+                "builder": "@angular/build:unit-test"
             }
         }
     }
+}
 }
