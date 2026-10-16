@@ -1,0 +1,70 @@
+<h1>Nuova segnalazione</h1>
+
+@if (inviata()) {
+<p>Segnalazione inviata, grazie!</p>
+}
+@if (avviso()) {
+<p>{{ avviso() }}</p>
+}
+
+<form [formGroup]="form" (ngSubmit)="invia()" novalidate>
+
+    <!-- TITOLO (obbligatorio) -->
+    <div>
+        <label for="titolo">Titolo *</label>
+        <input id="titolo" type="text" formControlName="titolo" maxlength="100" />
+        @if (form.controls.titolo.touched && form.controls.titolo.errors?.['required']) {
+        <p>Il titolo è obbligatorio.</p>
+        }
+    </div>
+
+    <!-- FOTO (obbligatoria). Accetta anche PNG: la conversione avviene nel component -->
+    <div>
+        <label for="foto">Foto del problema *</label>
+        <input #fileInput id="foto" type="file" accept="image/*" (change)="onFotoSelezionata($event)" />
+        @if (fotoErrore()) {
+        <p>{{ fotoErrore() }}</p>
+        }
+        @if (foto(); as src) {
+        <div>
+            <img [src]="src" alt="Anteprima della foto" width="240" />
+            <button type="button" (click)="rimuoviFoto()">Rimuovi foto</button>
+        </div>
+        } @else if (tentativoInvio()) {
+        <p>Devi allegare una foto del problema.</p>
+        }
+    </div>
+
+    <!-- POSIZIONE (rilevata in automatico, serve per latitudine/longitudine) -->
+    <div>
+        <p>Posizione</p>
+        @if (posizione(); as pos) {
+        <p>Posizione rilevata ({{ pos.latitudine.toFixed(5) }}, {{ pos.longitudine.toFixed(5) }})</p>
+        } @else if (posizioneErrore()) {
+        <p>{{ posizioneErrore() }}</p>
+        <button type="button" (click)="richiediPosizione()">Riprova</button>
+        } @else {
+        <p>Rilevamento della posizione in corso...</p>
+        }
+    </div>
+
+    <!-- DESCRIZIONE (facoltativa) -->
+    <div>
+        <label for="descrizione">Descrizione (facoltativa)</label>
+        <textarea id="descrizione" formControlName="descrizione" rows="4"></textarea>
+    </div>
+
+    <!-- SOLUZIONE (facoltativa) -> proposte_segnalazione -->
+    <div>
+        <label for="soluzione">Come si potrebbe risolvere? (facoltativa)</label>
+        <textarea id="soluzione" formControlName="soluzione" rows="4"></textarea>
+    </div>
+
+    @if (errore()) {
+    <p>{{ errore() }}</p>
+    }
+
+    <button type="submit" [disabled]="inviando() || !posizione()">
+        @if (inviando()) { Invio in corso... } @else { Invia segnalazione }
+    </button>
+</form>
