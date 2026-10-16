@@ -2,11 +2,12 @@
     "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
     "version": 1,
     "cli": {
-        "packageManager": "npm"
+        "packageManager": "npm",
+        "analytics": false
     },
     "newProjectRoot": "projects",
     "projects": {
-        "segnalazioni-fe": {
+        "tech-warrior-fe": {
             "projectType": "application",
             "schematics": {
                 "@schematics/angular:component": {
@@ -88,10 +89,10 @@
                     },
                     "configurations": {
                         "production": {
-                            "buildTarget": "segnalazioni-fe:build:production"
+                            "buildTarget": "tech-warrior-fe:build:production"
                         },
                         "development": {
-                            "buildTarget": "segnalazioni-fe:build:development"
+                            "buildTarget": "tech-warrior-fe:build:development"
                         }
                     },
                     "defaultConfiguration": "development"
