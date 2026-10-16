@@ -1,0 +1,25 @@
+<section class="pagina-mappa">
+    <header class="intestazione">
+        <h1>Mappa delle segnalazioni</h1>
+        @if (caricamento) {
+        <p class="stato">Carico le segnalazioni…</p>
+        }
+    </header>
+
+    @if (errore) {
+    <div class="messaggio messaggio-errore" role="alert">
+        <span>{{ errore }}</span>
+        <button type="button" (click)="riprova()">Riprova</button>
+    </div>
+    }
+
+    @if (erroreGps) {
+    <div class="messaggio messaggio-gps" role="alert">{{ erroreGps }}</div>
+    }
+
+    <div class="contenitore-mappa">
+        <app-mappa-view [segnalazioni]="segnalazioni" [statiAttivi]="statiAttivi" [posizioneUtente]="posizione"
+            (statoToggled)="toggleStato($event)" (posizioneRichiesta)="vaiAllaMiaPosizione()"
+            (segnalazioneSelezionata)="apriSegnalazione($event)" />
+    </div>
+</section>

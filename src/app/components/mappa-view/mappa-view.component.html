@@ -1,0 +1,25 @@
+<div class="mappa-wrapper">
+    <div #mappa class="mappa"></div>
+
+    <div class="legenda" role="group" aria-label="Filtra le segnalazioni per stato">
+        <p class="legenda-titolo">{{ visibili() }} segnalazioni visibili</p>
+        <div class="chip-lista">
+            @for (stato of stati; track stato) {
+            <button type="button" class="chip" [class.chip-spento]="!isAttivo(stato)"
+                [attr.aria-pressed]="isAttivo(stato)" (click)="statoToggled.emit(stato)">
+                <span class="chip-pallino" [style.background]="colore(stato)"></span>
+                {{ label(stato) }}
+            </button>
+            }
+        </div>
+    </div>
+
+    <div class="controlli">
+        <button type="button" class="btn-posizione" (click)="posizioneRichiesta.emit()">
+            Vai alla mia posizione
+        </button>
+        @if (fuoriComune()) {
+        <p class="avviso">La tua posizione è fuori dal territorio del comune.</p>
+        }
+    </div>
+</div>

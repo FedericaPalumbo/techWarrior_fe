@@ -1,0 +1,134 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
+.mappa-wrapper {
+    position: relative;
+    height: 100%;
+    min-height: 320px;
+}
+
+.mappa {
+    position: absolute;
+    inset: 0;
+}
+
+/* Legenda e chip sopra la mappa (z-index sopra ai controlli di Leaflet) */
+.legenda {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 1000;
+    max-width: 220px;
+    padding: 10px 12px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.legenda-titolo {
+    margin: 0 0 8px;
+    font-size: 0.8rem;
+    color: #4b5563;
+}
+
+.chip-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    background: #fff;
+    color: #111827;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: left;
+}
+
+.chip:focus-visible,
+.btn-posizione:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+.chip-pallino {
+    flex: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* Chip spento = stato nascosto dalla mappa */
+.chip-spento {
+    background: #f3f4f6;
+    color: #6b7280;
+    text-decoration: line-through;
+}
+
+.chip-spento .chip-pallino {
+    opacity: 0.35;
+}
+
+.controlli {
+    position: absolute;
+    left: 12px;
+    bottom: 28px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+}
+
+.btn-posizione {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.avviso {
+    margin: 0;
+    padding: 6px 10px;
+    background: #fef3c7;
+    color: #78350f;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+/* Su schermi stretti la legenda va in basso a scorrimento orizzontale */
+@media (max-width: 600px) {
+    .legenda {
+        top: auto;
+        right: 8px;
+        bottom: 8px;
+        left: 8px;
+        max-width: none;
+    }
+
+    .chip-lista {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 4px;
+    }
+
+    .chip {
+        flex: none;
+    }
+
+    .controlli {
+        bottom: 120px;
+    }
+}

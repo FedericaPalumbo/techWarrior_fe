@@ -1,0 +1,67 @@
+:host {
+    display: block;
+}
+
+/* Altezza = schermo meno la navbar: adatta il 4rem alla tua navbar */
+.pagina-mappa {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 4rem);
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+.intestazione {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.intestazione h1 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.stato {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.contenitore-mappa {
+    flex: 1;
+    min-height: 0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.messaggio {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.messaggio-errore {
+    background: #fee2e2;
+    color: #7f1d1d;
+}
+
+.messaggio-gps {
+    background: #fef3c7;
+    color: #78350f;
+}
+
+.messaggio button {
+    padding: 4px 12px;
+    border: 1px solid currentColor;
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
