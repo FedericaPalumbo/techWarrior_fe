@@ -3,7 +3,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { catchError, of, switchMap } from 'rxjs';
 import { SegnalazioneService } from '../../services/segnalazione.service';
-import { ImageService } from '../../services/image.service';
 
 interface Posizione {
     latitudine: number;
@@ -19,13 +18,14 @@ interface Posizione {
 export class SegnalazioneComponent implements OnInit {
     private fb = inject(FormBuilder);
     private segnalazioneSrv = inject(SegnalazioneService);
-    private imageSrv = inject(ImageService);
     private destroyRef = inject(DestroyRef);
 
     // Riferimento all'<input type="file" #fileInput> del template
     private fotoInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
 
-    private readonly MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB (prima della conversione)
+    // Controlli solo per l'utente (UX): la validazione vera (formato reale, peso) spetta al back
+    private readonly MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+    protected readonly TIPI_ACCETTATI = ['image/png', 'image/jpeg', 'image/webp'];
 
     // Campi di testo. "descrizione" e "soluzione" sono facoltativi.
     form = this.fb.nonNullable.group({
@@ -35,7 +35,8 @@ export class SegnalazioneComponent implements OnInit {
     });
 
     // Stato della pagina (signal, così il template si aggiorna anche dopo le callback async)
-    foto = signal<string | null>(null); // data URL JPEG, usato sia per anteprima che per l'invio
+    foto = signal<File | null>(null); // il file originale: è quello che manda il service
+    anteprima = signal<string | null>(null); // blob: URL solo per mostrare la foto nella pagina
     fotoErrore = signal<string | null>(null);
     posizione = signal<Posizione | null>(null);
     posizioneErrore = signal<string | null>(null);
@@ -44,6 +45,11 @@ export class SegnalazioneComponent implements OnInit {
     inviata = signal(false);
     errore = signal<string | null>(null);
     avviso = signal<string | null>(null);
+
+    constructor() {
+        // l'URL dell'anteprima occupa memoria finché non lo rilascio
+        this.destroyRef.onDestroy(() => this.rilasciaAnteprima());
+    }
 
     ngOnInit() {
         // latitudine e longitudine sono NOT NULL nel DB: le chiedo subito al dispositivo
@@ -83,8 +89,8 @@ export class SegnalazioneComponent implements OnInit {
 
         this.fotoErrore.set(null);
 
-        if (!file.type.startsWith('image/')) {
-            this.fotoErrore.set('Il file selezionato non è un\'immagine.');
+        if (!this.TIPI_ACCETTATI.includes(file.type)) {
+            this.fotoErrore.set('Formato non supportato: usa una foto PNG, JPEG o WEBP.');
             input.value = '';
             return;
         }
@@ -94,19 +100,13 @@ export class SegnalazioneComponent implements OnInit {
             return;
         }
 
-        // PNG (o altro) -> JPEG ridimensionato, in formato stringa come richiesto dal back
-        this.imageSrv
-            .toJpegDataUrl(file)
-            .then(dataUrl => this.foto.set(dataUrl))
-            .catch(() => {
-                this.fotoErrore.set('Non è stato possibile leggere l\'immagine. Prova con un\'altra foto.');
-                input.value = '';
-            });
+        // Nessuna conversione: al back arriva il file così com'è
+        this.impostaFoto(file);
     }
 
     rimuoviFoto() {
         this.svuotaInputFoto(); // permette di riselezionare lo stesso file
-        this.foto.set(null);
+        this.impostaFoto(null);
         this.fotoErrore.set(null);
     }
 
@@ -133,7 +133,7 @@ export class SegnalazioneComponent implements OnInit {
                 descrizione: descrizione.trim() || undefined,
                 latitudine: posizione.latitudine,
                 longitudine: posizione.longitudine,
-                immagini: [foto],
+                foto,
             })
             .pipe(
                 // Se c'è una soluzione la salvo come proposta collegata alla segnalazione appena creata
@@ -178,8 +178,22 @@ export class SegnalazioneComponent implements OnInit {
     private resetForm() {
         this.form.reset();
         this.svuotaInputFoto();
-        this.foto.set(null);
+        this.impostaFoto(null);
         this.fotoErrore.set(null);
         this.tentativoInvio.set(false);
+    }
+
+    // Tiene allineati file e anteprima, rilasciando sempre il blob: URL precedente
+    private impostaFoto(file: File | null) {
+        this.rilasciaAnteprima();
+        this.foto.set(file);
+        this.anteprima.set(file ? URL.createObjectURL(file) : null);
+    }
+
+    private rilasciaAnteprima() {
+        const url = this.anteprima();
+        if (url) {
+            URL.revokeObjectURL(url);
+        }
     }
 }

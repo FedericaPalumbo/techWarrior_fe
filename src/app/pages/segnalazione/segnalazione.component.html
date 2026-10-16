@@ -18,14 +18,15 @@
         }
     </div>
 
-    <!-- FOTO (obbligatoria). Accetta anche PNG: la conversione avviene nel component -->
+    <!-- FOTO (obbligatoria). Il file va al back così com'è (PNG, JPEG...): formato e salvataggio li gestisce lui -->
     <div>
         <label for="foto">Foto del problema *</label>
-        <input #fileInput id="foto" type="file" accept="image/*" (change)="onFotoSelezionata($event)" />
+        <input #fileInput id="foto" type="file" accept="image/png,image/jpeg,image/webp"
+            (change)="onFotoSelezionata($event)" />
         @if (fotoErrore()) {
         <p>{{ fotoErrore() }}</p>
         }
-        @if (foto(); as src) {
+        @if (anteprima(); as src) {
         <div>
             <img [src]="src" alt="Anteprima della foto" width="240" />
             <button type="button" (click)="rimuoviFoto()">Rimuovi foto</button>
