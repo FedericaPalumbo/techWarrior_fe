@@ -1,0 +1,23 @@
+<article>
+    <h2>{{ iniziativa().titolo }}</h2>
+
+    @if (immagine(); as src) {
+    <img [src]="src" [alt]="iniziativa().titolo">
+    }
+
+    <p>{{ iniziativa().descrizione }}</p>
+
+    @if (dettagli()) {
+    <p>{{ dettagli() }}</p>
+    }
+
+    @if (iniziativa().partecipantiCount !== undefined) {
+    <p>{{ iniziativa().partecipantiCount }} {{ iniziativa().partecipantiCount === 1 ? 'volontario' : 'volontari' }}</p>
+    }
+
+    @if (mostraPartecipa()) {
+    <button type="button" (click)="partecipa()">
+        {{ iniziativa().partecipo ? 'Annulla partecipazione' : 'Partecipo' }}
+    </button>
+    }
+</article>

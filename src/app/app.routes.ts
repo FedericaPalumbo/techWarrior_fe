@@ -3,6 +3,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { SegnalazioneComponent } from './pages/segnalazione/segnalazione.component';
 import { FeedComponent } from './pages/feed/feed.component';
+import { InvitoVolontariComponent } from './pages/invitoVolontari/invitoVolontari.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -11,5 +12,6 @@ export const routes: Routes = [
     { path: 'segnalazione', component: SegnalazioneComponent },
     // TODO: aggiungere un authGuard (come in EsameJavaScript_FE/utils/auth.guard.ts) quando sarà pronto
     { path: 'feed', component: FeedComponent },
+    { path: 'inviti', component: InvitoVolontariComponent },
     // TODO: { path: 'home', component: ... } per il cittadino
 ];

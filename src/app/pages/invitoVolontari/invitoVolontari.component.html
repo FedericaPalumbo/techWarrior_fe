@@ -1,0 +1,33 @@
+<div>
+    <header>
+        <h1>Inviti volontari</h1>
+
+        <!-- solo l'ente comunale può creare un invito -->
+        <div *ifRole="'ente'">
+            <app-iniziativa-addpulsante (onAdd)="create($event)" />
+        </div>
+    </header>
+
+    @if (errorMessage()) {
+    <div role="alert">
+        <p>{{ errorMessage() }}</p>
+        <button type="button" (click)="ricarica()">Riprova</button>
+    </div>
+    }
+
+    @let iniziative = iniziative$ | async;
+    @if (iniziative) {
+    <div>
+        @for (iniziativa of iniziative; track iniziativa.id) {
+        <app-iniziativa-card [iniziativa]="iniziativa" [mostraPartecipa]="authSrv.isCittadino()"
+            (onPartecipa)="partecipa(iniziativa.id)" (onAnnullaPartecipa)="annullaPartecipazione(iniziativa.id)" />
+        } @empty {
+        @if (!errorMessage()) {
+        <p>Nessun invito per ora.</p>
+        }
+        }
+    </div>
+    } @else {
+    <p>Caricamento...</p>
+    }
+</div>

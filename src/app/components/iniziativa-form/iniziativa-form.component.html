@@ -1,0 +1,51 @@
+<div>
+    <h4>Nuovo invito per volontari</h4>
+    <button type="button" (click)="activeModal.dismiss()">Chiudi</button>
+</div>
+
+<form [formGroup]="iniziativaForm" (ngSubmit)="submit()">
+    <div>
+        <label for="iniziativa-titolo">Titolo</label>
+        <input id="iniziativa-titolo" type="text" formControlName="titolo" maxlength="100">
+        @if (iniziativaForm.controls.titolo.invalid && iniziativaForm.controls.titolo.touched) {
+        <p role="alert">Il titolo è obbligatorio</p>
+        }
+    </div>
+
+    <div>
+        <label for="iniziativa-descrizione">Descrizione</label>
+        <textarea id="iniziativa-descrizione" formControlName="descrizione" rows="4"></textarea>
+        @if (iniziativaForm.controls.descrizione.invalid && iniziativaForm.controls.descrizione.touched) {
+        <p role="alert">La descrizione è obbligatoria</p>
+        }
+    </div>
+
+    <div>
+        <label for="iniziativa-luogo">Luogo (facoltativo)</label>
+        <input id="iniziativa-luogo" type="text" formControlName="luogo">
+    </div>
+
+    <div>
+        <label for="iniziativa-inizio">Data di inizio (facoltativa)</label>
+        <input id="iniziativa-inizio" type="datetime-local" formControlName="dataInizio">
+    </div>
+
+    <div>
+        <label for="iniziativa-fine">Data di fine (facoltativa)</label>
+        <input id="iniziativa-fine" type="datetime-local" formControlName="dataFine">
+        @if (iniziativaForm.errors?.['dateInvertite']) {
+        <p role="alert">La data di fine non può essere prima di quella di inizio</p>
+        }
+    </div>
+
+    <div>
+        <label for="iniziativa-immagine">Immagine (facoltativa)</label>
+        <input id="iniziativa-immagine" type="file" accept="image/png,image/jpeg,image/webp"
+            (change)="onFileSelected($event)">
+        @if (immagineErrore()) {
+        <p role="alert">{{ immagineErrore() }}</p>
+        }
+    </div>
+
+    <button type="submit" [disabled]="iniziativaForm.invalid">Pubblica invito</button>
+</form>

@@ -43,3 +43,22 @@ export type Proposta = {
     segnalazioneId: number,
     createdAt: string
 };
+
+// ---- Iniziative (inviti per reclutare volontari) ----
+// Rispecchia la tabella "iniziative". Le date arrivano dal back come stringhe ISO (TIMESTAMP).
+// "partecipantiCount" e "partecipo" NON sono colonne della tabella: servono alla card
+// e il back può calcolarli da partecipazioni_iniziativa. Da concordare col team back.
+export type Iniziativa = {
+    id: number,
+    titolo: string,
+    descrizione: string,
+    immagineUrl: string | null,
+    dataInizio: string | null,
+    dataFine: string | null,
+    luogo: string | null,
+    creatoreId: number,
+    createdAt: string,
+    updatedAt: string,
+    partecipantiCount?: number,
+    partecipo?: boolean
+};
