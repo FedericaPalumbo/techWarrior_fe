@@ -1,0 +1,79 @@
+<div class="register-page">
+    <main class="form-panel">
+        <div class="form-wrapper">
+            <h2 class="form-title">Crea il tuo account</h2>
+            <p class="form-subtitle">Bastano pochi dati per iniziare.</p>
+
+            <form [formGroup]="registerForm" (ngSubmit)="register()">
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">Nome</label>
+                        <input class="form-control" type="text" placeholder="es. Mario" formControlName="firstName"
+                            [class.is-invalid]="fieldError('firstName')">
+                        @if (fieldError('firstName'); as error) {
+                        <div class="field-error">{{ error }}</div>
+                        }
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">Cognome</label>
+                        <input class="form-control" type="text" placeholder="es. Rossi" formControlName="lastName"
+                            [class.is-invalid]="fieldError('lastName')">
+                        @if (fieldError('lastName'); as error) {
+                        <div class="field-error">{{ error }}</div>
+                        }
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input class="form-control" type="email" placeholder="nome@email.it" formControlName="email"
+                        [class.is-invalid]="fieldError('email')">
+                    @if (fieldError('email'); as error) {
+                    <div class="field-error">{{ error }}</div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="password-field">
+                        <input #pwd class="form-control" type="password" placeholder="Scegli la tua password"
+                            formControlName="password" [class.is-invalid]="fieldError('password')">
+                        <button class="toggle-password" type="button"
+                            (click)="pwd.type = pwd.type === 'password' ? 'text' : 'password'">
+                            {{ pwd.type === 'password' ? 'Mostra' : 'Nascondi' }}
+                        </button>
+                    </div>
+                    @if (fieldError('password'); as error) {
+                    <div class="field-error">{{ error }}</div>
+                    }
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Conferma password</label>
+                    <div class="password-field">
+                        <input #confirmPwd class="form-control" type="password" placeholder="Ripeti la password"
+                            formControlName="confirmPassword" [class.is-invalid]="fieldError('confirmPassword')">
+                        <button class="toggle-password" type="button"
+                            (click)="confirmPwd.type = confirmPwd.type === 'password' ? 'text' : 'password'">
+                            {{ confirmPwd.type === 'password' ? 'Mostra' : 'Nascondi' }}
+                        </button>
+                    </div>
+                    @if (fieldError('confirmPassword'); as error) {
+                    <div class="field-error">{{ error }}</div>
+                    }
+                </div>
+
+                <!-- errori non legati a un campo (es. password diverse, server non raggiungibile) -->
+                @if (errorMessage()) {
+                <div class="alert alert-danger py-2">{{ errorMessage() }}</div>
+                }
+
+                <button type="submit" class="btn btn-primary btn-register w-100 mb-4">Crea account &rsaquo;</button>
+
+                <div class="text-center form-footer">
+                    Hai già un account? <a class="link-accent" routerLink="/login">Accedi</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>

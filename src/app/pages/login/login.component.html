@@ -1,0 +1,39 @@
+<div class="login-page">
+    <main class="form-panel">
+        <div class="form-wrapper">
+            <h2 class="form-title">Accedi al tuo account</h2>
+            <p class="form-subtitle">Inserisci i tuoi dati per continuare.</p>
+
+            <form [formGroup]="loginForm" (ngSubmit)="login()">
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input class="form-control" type="email" placeholder="nome@email.it" formControlName="email">
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Password</label>
+                    <div class="password-field">
+                        <input #pwd class="form-control" type="password" placeholder="La tua password"
+                            formControlName="password">
+                        <button class="toggle-password" type="button"
+                            (click)="pwd.type = pwd.type === 'password' ? 'text' : 'password'">
+                            {{ pwd.type === 'password' ? 'Mostra' : 'Nascondi' }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- errori di accesso (credenziali errate, server non raggiungibile) -->
+                @if (errorMessage()) {
+                <div class="alert alert-danger py-2">{{ errorMessage() }}</div>
+                }
+
+                <button [disabled]="loginForm.invalid" type="submit" class="btn btn-primary btn-login w-100 mb-4">Accedi
+                    &rsaquo;</button>
+
+                <div class="text-center form-footer">
+                    Non hai ancora un account? <a class="link-accent" routerLink="/register">Registrati</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
