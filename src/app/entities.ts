@@ -43,7 +43,8 @@ export type Segnalazione = {
     indirizzo: string,
     autoreId: number,
     createdAt: string,
-    immagini: SegnalazioneImmagine[]
+    immagini: SegnalazioneImmagine[],
+    voti?: number
 };
 
 // Quello che serve alla mappa: solo le segnalazioni con coordinate

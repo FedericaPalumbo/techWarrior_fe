@@ -6,7 +6,7 @@ import { USER_ROLE_LABELS } from '../../entities';
 @Component({
     selector: 'app-nav-user',
     templateUrl: './nav-user.component.html',
-    // styleUrl: './nav-user.component.css',  // lo aggiungi quando farai il css
+    styleUrl: './nav-user.component.css',
 })
 export class NavUserComponent {
     user = input.required<User>();

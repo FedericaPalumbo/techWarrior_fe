@@ -1,5 +1,5 @@
-<div>
-    <header>
+<section class="inviti">
+    <header class="intestazione-pagina">
         <h1>Inviti volontari</h1>
 
         <!-- solo l'ente comunale può creare un invito -->
@@ -9,7 +9,7 @@
     </header>
 
     @if (errorMessage()) {
-    <div role="alert">
+    <div class="errore" role="alert">
         <p>{{ errorMessage() }}</p>
         <button type="button" (click)="ricarica()">Riprova</button>
     </div>
@@ -23,11 +23,11 @@
             (onPartecipa)="partecipa(iniziativa.id)" (onAnnullaPartecipa)="annullaPartecipazione(iniziativa.id)" />
         } @empty {
         @if (!errorMessage()) {
-        <p>Nessun invito per ora.</p>
+        <p class="stato">Nessun invito per ora.</p>
         }
         }
     </div>
     } @else {
-    <p>Caricamento...</p>
+    <p class="stato">Caricamento...</p>
     }
-</div>
+</section>

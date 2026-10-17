@@ -1,11 +1,8 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { filter, map } from 'rxjs';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { NavUserComponent } from '../nav-user/nav-user.component';
 import { IfAuthenticatedDirective } from '../../utils/if-authenticated.directive';
-import { IfRoleDirective } from '../../utils/if-role.directive';
 
 @Component({
     selector: 'app-navbar',
@@ -14,7 +11,6 @@ import { IfRoleDirective } from '../../utils/if-role.directive';
         RouterLinkActive,
         NavUserComponent,
         IfAuthenticatedDirective,
-        IfRoleDirective,
     ],
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.css',
@@ -28,19 +24,7 @@ export class NavbarComponent {
     // Dal mockup del feed la città compare nell'header. Per ora è fissa
     protected readonly citta = 'Vicenza';
 
-    // url corrente senza query string (es. /login?dest=/feed -> /login)
-    private currentPath = toSignal(
-        this.router.events.pipe(
-            filter(event => event instanceof NavigationEnd),
-            map(event => event.urlAfterRedirects.split('?')[0])
-        ),
-        { initialValue: this.router.url.split('?')[0] }
-    );
-
-    // nelle pagine di login e registrazione i pulsanti Accedi/Registrati in navbar sono superflui
-    showAuthBtns = computed(() => !['/login', '/register'].includes(this.currentPath()));
-
-    // menu a tendina aperto dall'hamburger
+    // menu a tendina aperto dall'hamburger (solo su telefono)
     menuAperto = signal(false);
 
     toggleMenu() {

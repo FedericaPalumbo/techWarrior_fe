@@ -17,7 +17,7 @@ import { IfRoleDirective } from '../../utils/if-role.directive';
         IfRoleDirective,
     ],
     templateUrl: './invitoVolontari.component.html',
-    // styleUrl: './invitoVolontari.component.css',  // lo aggiungi quando farai il css
+    styleUrl: './invitoVolontari.component.css',
 })
 export class InvitoVolontariComponent {
     protected authSrv = inject(AuthService);

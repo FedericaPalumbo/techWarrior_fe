@@ -38,6 +38,7 @@
     border: 0;
     background: none;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .hamburger span {
@@ -47,16 +48,22 @@
     background: var(--myc-viola-scuro);
 }
 
-/* Menu a tendina */
+/* Menu a tendina (telefono): nascosto finché non ha la classe "aperto" */
 .menu {
+    display: none;
     position: absolute;
     top: 100%;
     right: 12px;
     min-width: 230px;
+    max-width: calc(100vw - 24px);
     padding: 14px 18px;
     border-radius: 16px;
     background: #fff;
     box-shadow: 0 10px 28px rgba(60, 40, 110, 0.25);
+}
+
+.menu.aperto {
+    display: block;
 }
 
 .citta {
@@ -75,7 +82,7 @@
 
 .menu li a {
     display: block;
-    padding: 6px 0;
+    padding: 8px 0;
     color: var(--myc-testo);
     font-weight: 600;
     text-decoration: none;
@@ -86,14 +93,41 @@
     color: var(--myc-viola);
 }
 
-/* Accedi / Registrati quando non si è loggati */
-.auth {
-    display: flex;
-    gap: 16px;
-}
+/* ---------- Tablet / desktop: niente hamburger, la nav bar è sempre in linea ---------- */
+@media (min-width: 768px) {
+    .barra {
+        max-width: 1100px;
+    }
 
-.auth a {
-    color: var(--myc-viola-scuro);
-    font-weight: 700;
-    text-decoration: none;
+    .hamburger {
+        display: none;
+    }
+
+    .menu,
+    .menu.aperto {
+        position: static;
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        min-width: 0;
+        max-width: none;
+        padding: 0;
+        border-radius: 0;
+        background: none;
+        box-shadow: none;
+    }
+
+    .citta {
+        margin: 0;
+    }
+
+    .menu ul {
+        display: flex;
+        gap: 22px;
+        margin: 0;
+    }
+
+    .menu li a {
+        padding: 4px 0;
+    }
 }

@@ -1,0 +1,17 @@
+/* Stesso stile del pulsante "Fai una segnalazione" del feed */
+button {
+    padding: 10px 24px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--myc-lavanda);
+    box-shadow: 0 4px 14px rgba(60, 40, 110, 0.25);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+button:hover {
+    background: var(--myc-viola);
+    transform: translateY(-2px);
+}

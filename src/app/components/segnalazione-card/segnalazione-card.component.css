@@ -11,10 +11,8 @@
     color: #fff;
     cursor: pointer;
     transition: box-shadow 0.2s, transform 0.2s;
-}
-
-.card-segnalazione:hover {
-    box-shadow: 0 10px 24px rgba(80, 40, 140, 0.35);
+    /* niente flash grigio al tap sui telefoni */
+    -webkit-tap-highlight-color: transparent;
 }
 
 .card-segnalazione:focus-visible {
@@ -27,6 +25,7 @@
     font-size: 1.05rem;
     font-weight: 700;
     text-align: center;
+    overflow-wrap: anywhere;
 }
 
 /* Foto + pin (il pin sporge a destra, sul bordo in basso della foto) */
@@ -61,10 +60,6 @@
     height: 100%;
     fill: var(--myc-lavanda);
     filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
-}
-
-.pin:hover:not(:disabled) {
-    transform: scale(1.12);
 }
 
 .pin:disabled {
@@ -118,7 +113,6 @@
     fill: rgba(255, 255, 255, 0.5);
 }
 
-.voti button:hover svg,
 .voti button.attivo svg {
     fill: #fff;
 }
@@ -132,6 +126,22 @@
     font-size: 1.4rem;
     font-weight: 700;
     text-align: center;
+}
+
+/* Gli effetti hover solo con il mouse: su touch resterebbero "appiccicati" dopo il tap
+   (ad esempio il pollice resterebbe bianco anche dopo aver tolto il voto) */
+@media (hover: hover) {
+    .card-segnalazione:hover {
+        box-shadow: 0 10px 24px rgba(80, 40, 140, 0.35);
+    }
+
+    .pin:hover:not(:disabled) {
+        transform: scale(1.12);
+    }
+
+    .voti button:hover svg {
+        fill: #fff;
+    }
 }
 
 /* Suggerimenti: la card si allarga con una transizione sull'altezza */
@@ -189,4 +199,78 @@
 .invia:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+}
+
+/* ---------- Responsive (telefono) ---------- */
+@media (max-width: 575.98px) {
+    :host {
+        margin-bottom: 20px;
+    }
+
+    .card-segnalazione {
+        padding: 12px 12px 14px;
+        border-radius: 20px;
+    }
+
+    .intestazione {
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    /* foto più larga che alta, come nel mockup (cambia il rapporto per renderla più o meno alta) */
+    .foto img {
+        height: auto;
+        aspect-ratio: 5 / 2;
+        border-radius: 12px;
+    }
+
+    .pin {
+        right: -2px;
+        bottom: -22px;
+        width: 36px;
+        height: 36px;
+    }
+
+    .titolo {
+        margin-right: 40px;
+        font-size: 0.95rem;
+    }
+
+    .descrizione {
+        font-size: 0.75rem;
+    }
+
+    /* come nel mockup: punteggio a sinistra, pollice su leggermente alzato e pollice giù abbassato */
+    .voti {
+        gap: 2px;
+    }
+
+    .punteggio {
+        order: -1;
+        min-width: 0;
+        margin-right: 6px;
+        font-size: 1.25rem;
+    }
+
+    .voti button {
+        width: 34px;
+        height: 34px;
+    }
+
+    .voti button:first-of-type {
+        translate: 0 -5px;
+    }
+
+    .voti button:last-of-type {
+        translate: 4px 6px;
+    }
+
+    /* 16px: sotto questa soglia iPhone/Safari ingrandisce la pagina quando si tocca il campo */
+    .box-suggerimenti textarea {
+        font-size: 16px;
+    }
+
+    .invia {
+        padding: 8px 24px;
+    }
 }

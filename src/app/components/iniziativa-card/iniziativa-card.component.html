@@ -1,23 +1,35 @@
-<article>
-    <h2>{{ iniziativa().titolo }}</h2>
+<article class="card-invito">
+    <!-- foto a sinistra (come la miniatura di un video su YouTube) -->
+    <div class="foto">
+        @if (immagine(); as src) {
+        <img [src]="src" [alt]="iniziativa().titolo">
+        } @else {
+        <!-- TODO: sostituire il testo con il logo: <img src="logo-myc.png" alt="MyC"> -->
+        <div class="foto-placeholder" aria-hidden="true">MyC</div>
+        }
+    </div>
 
-    @if (immagine(); as src) {
-    <img [src]="src" [alt]="iniziativa().titolo">
-    }
+    <!-- testi a destra -->
+    <div class="contenuto">
+        <h2 class="titolo">{{ iniziativa().titolo }}</h2>
 
-    <p>{{ iniziativa().descrizione }}</p>
+        @if (dettagli()) {
+        <p class="dettagli">{{ dettagli() }}</p>
+        }
 
-    @if (dettagli()) {
-    <p>{{ dettagli() }}</p>
-    }
+        <p class="descrizione">{{ iniziativa().descrizione }}</p>
 
-    @if (iniziativa().partecipantiCount !== undefined) {
-    <p>{{ iniziativa().partecipantiCount }} {{ iniziativa().partecipantiCount === 1 ? 'volontario' : 'volontari' }}</p>
-    }
+        <div class="piede">
+            @if (iniziativa().partecipantiCount !== undefined) {
+            <span class="volontari">{{ iniziativa().partecipantiCount }} {{ iniziativa().partecipantiCount === 1 ?
+                'volontario' : 'volontari' }}</span>
+            }
 
-    @if (mostraPartecipa()) {
-    <button type="button" (click)="partecipa()">
-        {{ iniziativa().partecipo ? 'Annulla partecipazione' : 'Partecipo' }}
-    </button>
-    }
+            @if (mostraPartecipa()) {
+            <button type="button" class="btn-partecipa" [class.attivo]="iniziativa().partecipo" (click)="partecipa()">
+                {{ iniziativa().partecipo ? 'Annulla partecipazione' : 'Mi offro come volontario' }}
+            </button>
+            }
+        </div>
+    </div>
 </article>

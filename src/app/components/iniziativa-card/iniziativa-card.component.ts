@@ -5,7 +5,7 @@ import { Iniziativa } from '../../entities';
     selector: 'app-iniziativa-card',
     imports: [],
     templateUrl: './iniziativa-card.component.html',
-    // styleUrl: './iniziativa-card.component.css',  // lo aggiungi quando farai il css
+    styleUrl: './iniziativa-card.component.css',
 })
 export class IniziativaCardComponent {
     iniziativa = input.required<Iniziativa>();

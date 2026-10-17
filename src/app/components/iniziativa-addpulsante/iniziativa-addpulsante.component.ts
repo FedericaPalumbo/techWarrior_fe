@@ -7,7 +7,7 @@ Non chiama il backend: quando il modal viene chiuso con "Pubblica invito" emette
 @Component({
     selector: 'app-iniziativa-addpulsante',
     templateUrl: './iniziativa-addpulsante.component.html',
-    // styleUrl: './iniziativa-addpulsante.component.css',  // lo aggiungi quando farai il css
+    styleUrl: './iniziativa-addpulsante.component.css',
 })
 export class IniziativaAddPulsanteComponent {
     private modalService = inject(NgbModal);

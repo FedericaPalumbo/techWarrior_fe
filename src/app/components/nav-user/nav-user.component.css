@@ -26,3 +26,18 @@ button {
     font-weight: 600;
     cursor: pointer;
 }
+
+/* Tablet / desktop: l'utente sta in una riga dentro la nav bar */
+@media (min-width: 768px) {
+    div {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        padding-top: 0;
+        border-top: 0;
+    }
+
+    button {
+        margin-top: 0;
+    }
+}

@@ -6,7 +6,7 @@
     max-width: 520px;
     margin: 0 auto;
     /* il padding in basso evita che l'ultima card finisca sotto il pulsante fisso */
-    padding: 24px 16px 120px;
+    padding: 24px 16px calc(120px + env(safe-area-inset-bottom, 0px));
 }
 
 .stato {
@@ -34,14 +34,15 @@
     font-weight: 600;
 }
 
-/* Pulsante fisso in basso, centrato */
+/* Pulsante fisso in basso, centrato: resta sullo schermo mentre si scorre.
+   La larghezza si adatta agli schermi stretti (max 320px, sempre con un margine ai lati) */
 .btn-segnala {
     position: fixed;
     left: 50%;
-    bottom: 24px;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
     transform: translateX(-50%);
     z-index: 1000;
-    width: 320px;
+    width: min(320px, calc(100% - 64px));
     padding: 14px 24px;
     border-radius: 999px;
     background: rgba(142, 139, 181, 0.92);
@@ -55,8 +56,29 @@
     transition: background 0.2s, transform 0.2s;
 }
 
-.btn-segnala:hover {
+/* su touch :hover resta "appiccicato" dopo il tap: lo uso solo con il mouse */
+@media (hover: hover) {
+    .btn-segnala:hover {
+        background: var(--myc-viola);
+        color: #fff;
+        transform: translateX(-50%) translateY(-2px);
+    }
+}
+
+.btn-segnala:active {
     background: var(--myc-viola);
     color: #fff;
-    transform: translateX(-50%) translateY(-2px);
+}
+
+/* ---------- Responsive (telefono) ---------- */
+@media (max-width: 575.98px) {
+    .feed {
+        padding: 16px 14px calc(110px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .btn-segnala {
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        padding: 13px 20px;
+        font-size: 1.05rem;
+    }
 }
