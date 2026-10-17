@@ -1,9 +1,12 @@
 <nav class="barra" aria-label="Navigazione principale">
-    <!-- da loggato il logo porta al feed, altrimenti al login -->
-    <a class="logo" [routerLink]="currentUser() ? '/feed' : '/login'" aria-label="MyC">
-        <!-- TODO: sostituire il testo con il logo (il PDF va convertito in SVG/PNG): <img src="logo-myc.svg" alt="MyC"> -->
-        <span class="logo-placeholder">MyC</span>
-    </a>
+    <!-- sinistra: logo + città, vicini tra loro -->
+    <div class="brand">
+        <!-- da loggato il logo porta al feed, altrimenti al login -->
+        <a class="logo" [routerLink]="currentUser() ? '/feed' : '/login'" aria-label="MyC">
+            <img class="logo-img" src="images/logo-myc.png" alt="MyC">
+        </a>
+        <span class="citta">{{ citta }}</span>
+    </div>
 
     <!-- su telefono l'hamburger apre il menu; da tablet/desktop il menu è sempre visibile in linea
          e l'hamburger sparisce (css) -->
@@ -12,10 +15,11 @@
         <span></span><span></span><span></span>
     </button>
 
-    <!-- sempre nel DOM: la classe "aperto" lo mostra su telefono -->
+    <!-- sempre nel DOM: la classe "aperto" lo mostra su telefono.
+         Da tablet/desktop è "trasparente" (display: contents): ul e .destra diventano
+         direttamente elementi flex della barra -->
     <div class="menu" id="menu-principale" [class.aperto]="menuAperto()">
-        <span class="citta">{{ citta }}</span>
-
+        <!-- centro: i link delle 4 pagine -->
         <ul (click)="chiudiMenu()">
             <li><a routerLink="/mappa" routerLinkActive="active">Mappa</a></li>
             <li><a routerLink="/feed" routerLinkActive="active">Feed</a></li>
@@ -23,7 +27,9 @@
             <li><a routerLink="/inviti" routerLinkActive="active">Inviti</a></li>
         </ul>
 
-        <!-- nome utente ed "Esci" solo se loggato -->
-        <app-nav-user *ifAuthenticated [user]="currentUser()!" (logout)="logout()" />
+        <!-- destra: nome + ruolo e "Esci", solo se loggato -->
+        <div class="destra">
+            <app-nav-user *ifAuthenticated [user]="currentUser()!" (logout)="logout()" />
+        </div>
     </div>
 </nav>

@@ -1,25 +1,57 @@
 <section class="pagina-mappa">
-    <header class="intestazione">
-        <h1>Mappa delle segnalazioni</h1>
-        @if (caricamento) {
+
+    <!-- Barra "Seleziona la zona": stessa grafica della pagina segnalazione -->
+    <header class="zona">
+        <h1 class="titolo-pagina">Seleziona la zona</h1>
+
+        <div class="ricerca">
+            <label class="visually-hidden" for="zona-mappa">Cerca una zona sulla mappa</label>
+            <input id="zona-mappa" type="text" maxlength="255" placeholder="es. Via Roma 10, Vicenza"
+                [value]="testoRicerca()" (input)="scriviRicerca($event)" (keydown.enter)="cercaIndirizzo()" />
+            <button type="button" class="ricerca-btn" aria-label="Cerca la zona sulla mappa"
+                [disabled]="ricercaInCorso()" (click)="cercaIndirizzo()">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" aria-hidden="true">
+                    <circle cx="10.5" cy="10.5" r="6.5" />
+                    <path d="M15.5 15.5 21 21" />
+                </svg>
+            </button>
+        </div>
+
+        @if (avvisoZona()) {
+        <p class="messaggio-zona" role="status">{{ avvisoZona() }}</p>
+        }
+        @if (caricamento()) {
         <p class="stato">Carico le segnalazioni…</p>
         }
     </header>
 
-    @if (errore) {
+    @if (errore()) {
     <div class="messaggio messaggio-errore" role="alert">
-        <span>{{ errore }}</span>
+        <span>{{ errore() }}</span>
         <button type="button" (click)="riprova()">Riprova</button>
     </div>
     }
 
-    @if (erroreGps) {
-    <div class="messaggio messaggio-gps" role="alert">{{ erroreGps }}</div>
+    @if (erroreGps()) {
+    <div class="messaggio messaggio-gps" role="alert">{{ erroreGps() }}</div>
+    }
+
+    @if (esito(); as e) {
+    <div class="messaggio messaggio-esito" [class.messaggio-ok]="e.ok" [class.messaggio-errore]="!e.ok" role="status">
+        {{ e.testo }}
+    </div>
     }
 
     <div class="contenitore-mappa">
-        <app-mappa-view [segnalazioni]="segnalazioni" [statiAttivi]="statiAttivi" [posizioneUtente]="posizione"
-            (statoToggled)="toggleStato($event)" (posizioneRichiesta)="vaiAllaMiaPosizione()"
+        <app-mappa-view [segnalazioni]="segnalazioni()" [statiAttivi]="statiAttivi()" [posizioneUtente]="posizione()"
+            [centraSu]="centraSu()" (statoToggled)="toggleStato($event)" (posizioneRichiesta)="vaiAllaMiaPosizione()"
             (segnalazioneSelezionata)="apriSegnalazione($event)" />
     </div>
+
+    <!-- Si apre toccando un pin -->
+    @if (selezionata(); as s) {
+    <app-segnalazione-modale [segnalazione]="s" [votoIniziale]="votoDi(s.id)" (onVota)="vota($event)"
+        (onInvia)="inviaConferma($event)" (onChiudi)="chiudiModale()" />
+    }
 </section>

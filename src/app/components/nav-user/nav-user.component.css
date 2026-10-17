@@ -1,4 +1,4 @@
-div {
+.utente {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -7,11 +7,18 @@ div {
     font-size: 0.85rem;
 }
 
-span:first-child {
+/* nome sopra, ruolo sotto */
+.info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+}
+
+.nome {
     font-weight: 700;
 }
 
-span:nth-child(2) {
+.ruolo {
     color: var(--myc-lavanda);
 }
 
@@ -27,17 +34,23 @@ button {
     cursor: pointer;
 }
 
-/* Tablet / desktop: l'utente sta in una riga dentro la nav bar */
+/* Tablet / desktop: a sinistra nome e ruolo (uno sotto l'altro), a destra "Esci" */
 @media (min-width: 768px) {
-    div {
+    .utente {
         flex-direction: row;
         align-items: center;
-        gap: 12px;
+        gap: 14px;
         padding-top: 0;
         border-top: 0;
     }
 
+    .info {
+        text-align: right;
+        white-space: nowrap;
+    }
+
     button {
+        align-self: center;
         margin-top: 0;
     }
 }

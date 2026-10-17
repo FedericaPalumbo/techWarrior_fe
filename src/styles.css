@@ -18,3 +18,37 @@ body {
     /* sfondo chiaro sfumato come nel mockup */
     background: linear-gradient(160deg, #f6f8f8 0%, #e4edec 45%, #f8f7fb 100%) fixed;
 }
+
+/* ---------- Mappa (Leaflet) ----------
+   Pin e cluster li crea Leaflet fuori dai componenti: gli stili di un componente non li raggiungono, quindi stanno qui. */
+
+.leaflet-container {
+    font-family: inherit;
+}
+
+/* Il pin è toccabile: il cursore e il focus da tastiera lo fanno capire */
+.pin-segnalazione {
+    cursor: pointer;
+}
+
+.pin-segnalazione:focus-visible {
+    outline: 3px solid var(--myc-viola);
+    outline-offset: 2px;
+    border-radius: 50%;
+}
+
+/* Cluster nei colori dell'app (al posto del verde/giallo/arancione di Leaflet) */
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+    background-color: rgba(111, 66, 176, 0.3);
+}
+
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+    background-color: rgba(111, 66, 176, 0.9);
+    color: #fff;
+    font-family: inherit;
+    font-weight: 700;
+}

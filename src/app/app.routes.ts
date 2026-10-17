@@ -14,7 +14,7 @@ export const routes: Routes = [
     //{ path: 'segnalazioni', component: SegnalazioneComponent },
     //{ path: 'feed', component: FeedComponent },
     //{ path: 'inviti', component: InvitoVolontariComponent },
-    { path: 'mappa', component: MappaComponent },
+    { path: 'mappa', component: MappaComponent, canActivate: [authGuard] },
     { path: 'segnalazione', component: SegnalazioneComponent, canActivate: [authGuard] },
     { path: 'feed', component: FeedComponent, canActivate: [authGuard] },
     { path: 'inviti', component: InvitoVolontariComponent, canActivate: [authGuard] },

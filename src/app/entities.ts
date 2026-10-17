@@ -53,7 +53,12 @@ export type SegnalazioneMappa = {
     titolo: string,
     stato: StatoSegnalazione,
     latitudine: number,
-    longitudine: number
+    longitudine: number,
+    voti?: number,
+    // servono al modale che si apre toccando il pin
+    indirizzo?: string,
+    descrizione?: string | null,
+    immagineUrl?: string | null // la prima foto caricata alla creazione della segnalazione
 };
 
 // La "soluzione" proposta dall'utente (tabella proposte_segnalazione)

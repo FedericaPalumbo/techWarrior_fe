@@ -1,0 +1,97 @@
+<!-- il mousedown sullo sfondo (non il click) chiude: così trascinare la selezione di un testo fuori dal modale non lo chiude per errore -->
+<div class="sfondo" (mousedown)="$event.target === $event.currentTarget && onChiudi.emit()">
+    <section #dialogo class="modale" role="dialog" aria-modal="true" aria-labelledby="modale-titolo" tabindex="-1">
+
+        <button type="button" class="chiudi" aria-label="Chiudi" (click)="onChiudi.emit()">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+        </button>
+
+        <!-- 1) Che problema è: via, foto caricata, titolo e descrizione (stessa grafica viola della card del feed) -->
+        <div class="scheda">
+            @if (segnalazione().indirizzo; as via) {
+            <p class="via">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                    <circle cx="12" cy="9" r="3" fill="#6f42b0" />
+                </svg>
+                <span>{{ via }}</span>
+            </p>
+            }
+
+            @if (segnalazione().immagineUrl; as src) {
+            <!-- se l'immagine non si carica la nascondo, così non resta il simbolo dell'immagine rotta -->
+            <img class="foto-segnalazione" [src]="src" [alt]="'Foto della segnalazione: ' + segnalazione().titolo"
+                (error)="$any($event.target).hidden = true" />
+            }
+
+            <header class="testata">
+                <span class="stato" [style.--colore-stato]="colore()">{{ label() }}</span>
+                <h2 id="modale-titolo" class="titolo">{{ segnalazione().titolo }}</h2>
+            </header>
+
+            @if (segnalazione().descrizione; as testo) {
+            <p class="descrizione">{{ testo }}</p>
+            }
+        </div>
+
+        <!-- 2) Up vote / down vote -->
+        <div class="voti" role="group" aria-label="Vota la segnalazione">
+            <button type="button" aria-label="Up vote: il problema è reale" [class.attivo]="voto() === 'su'"
+                [attr.aria-pressed]="voto() === 'su'" (click)="vota('su')">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                        d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+                </svg>
+            </button>
+            <span class="punteggio" aria-live="polite">{{ punteggio() }}</span>
+            <button type="button" aria-label="Down vote: il problema non è reale" [class.attivo]="voto() === 'giu'"
+                [attr.aria-pressed]="voto() === 'giu'" (click)="vota('giu')">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                        d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- 3) Foto di conferma (facoltative) -->
+        <div class="campo">
+            <span class="etichetta">Foto di conferma <span class="facoltativo">(facoltative)</span></span>
+
+            <!-- l'input vero è nascosto: la label qui sotto fa da pulsante -->
+            <input id="foto-conferma" class="foto-input" type="file" multiple accept="image/png,image/jpeg,image/webp"
+                (change)="onFotoSelezionate($event)" />
+            @if (foto().length < MAX_FOTO) { <label for="foto-conferma" class="foto-area">Aggiungi una foto</label>
+                }
+
+                @if (fotoErrore()) {
+                <p class="errore-campo" role="alert">{{ fotoErrore() }}</p>
+                }
+
+                @if (foto().length) {
+                <ul class="anteprime">
+                    @for (f of foto(); track f.url) {
+                    <li>
+                        <img [src]="f.url" alt="Anteprima della foto di conferma" />
+                        <button type="button" class="rimuovi" aria-label="Rimuovi questa foto" (click)="rimuoviFoto(f)">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M6 6l12 12M18 6 6 18" />
+                            </svg>
+                        </button>
+                    </li>
+                    }
+                </ul>
+                }
+        </div>
+
+        <!-- 4) Suggerimenti (facoltativi) + Invia -->
+        <div class="campo">
+            <label for="suggerimento">Suggerimenti <span class="facoltativo">(facoltativi)</span></label>
+            <textarea id="suggerimento" rows="3" maxlength="2000" placeholder="Come si potrebbe risolvere?"
+                [value]="suggerimento()" (input)="scrivi($event)"></textarea>
+        </div>
+
+        <button type="button" class="btn-invia" [disabled]="!puoInviare()" (click)="invia()">Invia</button>
+    </section>
+</div>
