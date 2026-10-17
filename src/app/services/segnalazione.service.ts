@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SegnalazioneMappa } from '../entities';
 import { Proposta, Segnalazione } from '../entities';
+import { BehaviorSubject, catchError, map, of, switchMap, tap } from 'rxjs';
 
 // autoreId non si manda: il back lo ricava dal token JWT (come createdBy in EsameJavaScript).
 // "foto" è il File originale scelto dall'utente (PNG, JPEG...), senza nessuna conversione.
@@ -33,6 +34,18 @@ export class SegnalazioneService {
     find() {
         return this.http.get<Segnalazione[]>(this.baseUrl);
     }
+
+    segnalazioni$ = this.reload$.pipe(
+        tap(() => this.errorMessage.set(null)),
+        switchMap(() => this.segnalazioneSrv.find().pipe(
+            tap(res => console.log('feed response', res)),   // <-- il log
+            map((res: any) => Array.isArray(res) ? res : (res?.data ?? [])),
+            catchError(response => {
+                this.errorMessage.set(response.error?.message ?? 'Si è verificato un errore, riprova più tardi');
+                return of([]);
+            })
+        ))
+    );
 
     // Lista leggera per la mappa (solo id, titolo, stato, coordinate)
     findPerMappa(): Observable<SegnalazioneMappa[]> {

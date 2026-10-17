@@ -11,11 +11,11 @@ export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
-    { path: 'segnalazione', component: SegnalazioneComponent },
+    //{ path: 'segnalazioni', component: SegnalazioneComponent },
     //{ path: 'feed', component: FeedComponent },
     //{ path: 'inviti', component: InvitoVolontariComponent },
-    //{ path: 'mappa', component: MappaComponent }
-    { path: 'segnalazione', component: SegnalazioneComponent, canActivate: [authGuard] },
+    { path: 'mappa', component: MappaComponent },
+    { path: 'segnalazioni', component: SegnalazioneComponent, canActivate: [authGuard] },
     { path: 'feed', component: FeedComponent, canActivate: [authGuard] },
     { path: 'inviti', component: InvitoVolontariComponent, canActivate: [authGuard] },
 ];
