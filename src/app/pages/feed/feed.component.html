@@ -6,16 +6,22 @@
     </div>
     }
 
-    @let segnalazioni = segnalazioni$ | async;
-    @if (segnalazioni) {
-    @for (segnalazione of segnalazioni; track segnalazione.id) {
-    <app-segnalazione-card [segnalazione]="segnalazione" (onMappa)="vaiAllaMappa(segnalazione.id)"
-        (onVota)="vota(segnalazione.id, $event)" (onSuggerimento)="inviaSuggerimento(segnalazione.id, $event)" />
-    } @empty {
-    @if (!errorMessage()) {
-    <p class="stato">Nessuna segnalazione per ora.</p>
-    }
-    }
+    @if (segnalazioni(); as lista) {
+        @if (lista.length) {
+        <div class="colonne">
+            @for (colonna of colonne(); track $index) {
+            <div class="colonna">
+                @for (segnalazione of colonna; track segnalazione.id) {
+                <app-segnalazione-card [segnalazione]="segnalazione" (onMappa)="vaiAllaMappa(segnalazione.id)"
+                    (onVota)="vota(segnalazione.id, $event)"
+                    (onSuggerimento)="inviaSuggerimento(segnalazione.id, $event)" />
+                }
+            </div>
+            }
+        </div>
+        } @else if (!errorMessage()) {
+        <p class="stato">Nessuna segnalazione per ora.</p>
+        }
     } @else {
     <p class="stato">Caricamento...</p>
     }

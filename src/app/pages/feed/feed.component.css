@@ -3,10 +3,29 @@
 }
 
 .feed {
-    max-width: 520px;
+    max-width: 1200px;
     margin: 0 auto;
     /* il padding in basso evita che l'ultima card finisca sotto il pulsante fisso */
     padding: 24px 16px calc(120px + env(safe-area-inset-bottom, 0px));
+}
+
+/* colonne indipendenti: ognuna cresce per conto suo */
+.colonne {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.colonna {
+    flex: 1 1 0;
+    min-width: 0; /* evita che contenuti larghi allarghino la colonna */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+app-segnalazione-card {
+    display: block;
 }
 
 .stato {
@@ -73,7 +92,12 @@
 /* ---------- Responsive (telefono) ---------- */
 @media (max-width: 575.98px) {
     .feed {
+        max-width: 520px;
         padding: 16px 14px calc(110px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .colonna {
+        gap: 16px;
     }
 
     .btn-segnala {

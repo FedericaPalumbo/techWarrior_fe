@@ -1,19 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SegnalazioneMappa } from '../entities';
-import { Proposta, Segnalazione } from '../entities';
-import { BehaviorSubject, catchError, map, of, switchMap, tap } from 'rxjs';
+import { Proposta, Segnalazione, SegnalazioneMappa } from '../entities';
 
 // autoreId non si manda: il back lo ricava dal token JWT (come createdBy in EsameJavaScript).
-// "foto" è il File originale scelto dall'utente (PNG, JPEG...), senza nessuna conversione.
-// descrizione e foto sono facoltative: se mancano non vengono inviate.
+// "immagini" è il File originale scelto dall'utente (PNG, JPEG...), senza nessuna conversione.
+// descrizione e immagini sono facoltative: se mancano non vengono inviate.
 // Latitudine e longitudine non si mandano: le ricava il back dall'indirizzo (geocodifica).
 export type CreateSegnalazionePayload = {
     titolo: string,
     descrizione?: string,
     indirizzo: string,
-    foto?: File | null
+    immagini?: File | null
 };
 
 export type CreatePropostaPayload = {
@@ -41,7 +39,7 @@ export class SegnalazioneService {
     }
 
     // CONTRATTO CON IL BACK (da concordare col team): multipart/form-data con i campi
-    // titolo, indirizzo (obbligatori) e descrizione, foto (file) (facoltativi).
+    // titolo, indirizzo (obbligatori) e descrizione, immagini (file) (facoltativi).
     // Il back ricava latitudine/longitudine dall'indirizzo, valida il file, lo salva e scrive l'url in segnalazione_immagini.
     // Non impostare Content-Type a mano: il browser aggiunge il boundary da solo.
     create(payload: CreateSegnalazionePayload) {
@@ -51,8 +49,8 @@ export class SegnalazioneService {
             body.append('descrizione', payload.descrizione);
         }
         body.append('indirizzo', payload.indirizzo);
-        if (payload.foto) {
-            body.append('foto', payload.foto, payload.foto.name);
+        if (payload.immagini) {
+            body.append('immagini', payload.immagini, payload.immagini.name);
         }
 
         return this.http.post<Segnalazione>(this.baseUrl, body);

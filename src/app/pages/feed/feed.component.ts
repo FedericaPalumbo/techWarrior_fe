@@ -1,17 +1,15 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
-import { AsyncPipe } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, DestroyRef, HostListener, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { BehaviorSubject, catchError, map, of, switchMap, tap } from 'rxjs';
+import { Segnalazione } from '../../entities';
 import { SegnalazioneService } from '../../services/segnalazione.service';
 import { SegnalazioneCardComponent, Voto } from '../../components/segnalazione-card/segnalazione-card.component';
-
 
 @Component({
     selector: 'app-feed',
     imports: [
         SegnalazioneCardComponent,
-        AsyncPipe,
         RouterLink,
     ],
     templateUrl: './feed.component.html',
@@ -27,17 +25,42 @@ export class FeedComponent {
     // emette ogni volta che il feed va ricaricato (la prima emissione è il caricamento iniziale)
     protected reload$ = new BehaviorSubject<void>(undefined);
 
-    segnalazioni$ = this.reload$.pipe(
+    private segnalazioni$ = this.reload$.pipe(
         tap(() => this.errorMessage.set(null)),
         switchMap(() => this.segnalazioneSrv.find().pipe(
-            tap(res => console.log('feed response', res)),   // <-- il log
-            map((res: any) => Array.isArray(res) ? res : (res?.data ?? [])),
+            map((res: any): Segnalazione[] => Array.isArray(res) ? res : (res?.data ?? [])),
             catchError(response => {
                 this.errorMessage.set(response.error?.message ?? 'Si è verificato un errore, riprova più tardi');
-                return of([]);
+                return of([] as Segnalazione[]);
             })
         ))
     );
+
+    // undefined = ancora in caricamento, array (anche vuoto) = dati arrivati
+    segnalazioni = toSignal(this.segnalazioni$);
+
+    numColonne = signal(this.calcolaColonne());
+
+    // la card i va nella colonna i % n: l'assegnazione non cambia quando una card si espande
+    colonne = computed<Segnalazione[][]>(() => {
+        const lista = this.segnalazioni() ?? [];
+        const n = this.numColonne();
+        const risultato: Segnalazione[][] = Array.from({ length: n }, () => []);
+        lista.forEach((s, i) => risultato[i % n].push(s));
+        return risultato;
+    });
+
+    @HostListener('window:resize')
+    onResize() {
+        this.numColonne.set(this.calcolaColonne());
+    }
+
+    private calcolaColonne(): number {
+        const w = window.innerWidth;
+        if (w < 660) return 1;   // telefono
+        if (w < 1000) return 2;  // tablet
+        return 3;                // desktop
+    }
 
     ricarica() {
         this.reload$.next();

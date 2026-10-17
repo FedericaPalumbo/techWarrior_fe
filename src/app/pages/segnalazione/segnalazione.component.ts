@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, OnInit, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Subject, catchError, of, switchMap, tap } from 'rxjs';
@@ -20,7 +20,7 @@ function testoMinimo(min: number): ValidatorFn {
     templateUrl: './segnalazione.component.html',
     styleUrl: './segnalazione.component.css',
 })
-export class SegnalazioneComponent {
+export class SegnalazioneComponent implements OnInit {
     private fb = inject(FormBuilder);
     private segnalazioneSrv = inject(SegnalazioneService);
     private posizioneSrv = inject(PosizioneService);
@@ -210,7 +210,7 @@ export class SegnalazioneComponent {
                 titolo: titolo.trim(),
                 descrizione: descrizione.trim(),
                 indirizzo: indirizzo.trim(),
-                foto,
+                immagini: foto,
             })
             .pipe(
                 // Se c'è una soluzione la salvo come proposta collegata alla segnalazione appena creata

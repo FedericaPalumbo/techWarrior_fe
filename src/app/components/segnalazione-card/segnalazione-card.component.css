@@ -6,7 +6,7 @@
 .card-segnalazione {
     padding: 14px 14px 16px;
     border-radius: 22px;
-    background: var(--myc-viola);
+    background: #8d78cd;
     box-shadow: 0 6px 18px rgba(80, 40, 140, 0.25);
     color: #fff;
     cursor: pointer;
