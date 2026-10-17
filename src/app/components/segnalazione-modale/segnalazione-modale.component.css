@@ -45,6 +45,8 @@
     position: absolute;
     top: 12px;
     right: 12px;
+    /* sopra la scheda viola, che viene dopo nel DOM */
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -54,7 +56,8 @@
     border: 0;
     border-radius: 50%;
     background: transparent;
-    color: var(--myc-testo);
+    /* sta sulla fascia viola */
+    color: #fff;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
 }
@@ -69,17 +72,68 @@
     stroke-linecap: round;
 }
 
-.chiudi:focus-visible,
+.chiudi:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: -3px;
+}
+
 .rimuovi:focus-visible {
     outline: 3px solid var(--myc-viola);
     outline-offset: 1px;
 }
 
-/* ---------- Testata: stato + titolo ---------- */
+/* ---------- Scheda viola: via, foto, stato, titolo, descrizione ---------- */
+
+.scheda {
+    /* margini negativi = la fascia arriva ai bordi del modale (gli angoli in alto li arrotonda il modale) */
+    margin: -28px -24px 22px;
+    padding: 16px 24px 22px;
+    background: var(--myc-viola);
+    color: #fff;
+}
+
+/* la via: icona del pin + indirizzo (spazio a destra per non finire sotto al pulsante Chiudi) */
+.via {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    margin: 0 44px 8px 0;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.via svg {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    fill: #fff;
+}
+
+/* la foto postata alla creazione: larga come la scheda, alta al massimo 220px */
+.foto-segnalazione {
+    display: block;
+    width: 100%;
+    max-height: 220px;
+    margin-bottom: 14px;
+    border-radius: 14px;
+    object-fit: cover;
+    background: #2b2340;
+}
 
 .testata {
-    /* spazio a destra per non finire sotto al pulsante Chiudi */
-    margin: 0 40px 18px 0;
+    margin: 0 0 8px;
+}
+
+.descrizione {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    /* mantiene gli a capo scritti dall'utente */
+    white-space: pre-line;
+    overflow-wrap: anywhere;
 }
 
 .stato {
@@ -107,7 +161,7 @@
 
 .titolo {
     margin: 0;
-    color: var(--myc-viola);
+    color: #fff;
     font-size: 1.4rem;
     font-weight: 700;
     line-height: 1.25;
@@ -344,8 +398,7 @@
 /* Gli effetti hover solo con il mouse: su touch resterebbero "appiccicati" dopo il tap */
 @media (hover: hover) {
     .chiudi:hover {
-        background: #f1edf8;
-        color: var(--myc-viola);
+        background: rgba(255, 255, 255, 0.2);
     }
 
     .voti button:not(.attivo):hover {
@@ -394,6 +447,15 @@
         max-height: 92dvh;
         padding: 24px 18px calc(20px + env(safe-area-inset-bottom, 0px));
         border-radius: 24px 24px 0 0;
+    }
+
+    .scheda {
+        margin: -24px -18px 20px;
+        padding: 14px 18px 20px;
+    }
+
+    .foto-segnalazione {
+        max-height: 180px;
     }
 
     .titolo {

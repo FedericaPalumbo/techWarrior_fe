@@ -8,11 +8,33 @@
             </svg>
         </button>
 
-        <!-- 1) Che problema è -->
-        <header class="testata">
-            <span class="stato" [style.--colore-stato]="colore()">{{ label() }}</span>
-            <h2 id="modale-titolo" class="titolo">{{ segnalazione().titolo }}</h2>
-        </header>
+        <!-- 1) Che problema è: via, foto caricata, titolo e descrizione (stessa grafica viola della card del feed) -->
+        <div class="scheda">
+            @if (segnalazione().indirizzo; as via) {
+            <p class="via">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                    <circle cx="12" cy="9" r="3" fill="#6f42b0" />
+                </svg>
+                <span>{{ via }}</span>
+            </p>
+            }
+
+            @if (segnalazione().immagineUrl; as src) {
+            <!-- se l'immagine non si carica la nascondo, così non resta il simbolo dell'immagine rotta -->
+            <img class="foto-segnalazione" [src]="src" [alt]="'Foto della segnalazione: ' + segnalazione().titolo"
+                (error)="$any($event.target).hidden = true" />
+            }
+
+            <header class="testata">
+                <span class="stato" [style.--colore-stato]="colore()">{{ label() }}</span>
+                <h2 id="modale-titolo" class="titolo">{{ segnalazione().titolo }}</h2>
+            </header>
+
+            @if (segnalazione().descrizione; as testo) {
+            <p class="descrizione">{{ testo }}</p>
+            }
+        </div>
 
         <!-- 2) Up vote / down vote -->
         <div class="voti" role="group" aria-label="Vota la segnalazione">

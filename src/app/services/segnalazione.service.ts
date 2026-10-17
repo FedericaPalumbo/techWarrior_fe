@@ -55,6 +55,9 @@ export class SegnalazioneService {
                         latitudine: Number(s.latitudine),
                         longitudine: Number(s.longitudine),
                         voti: s.voti,
+                        indirizzo: s.indirizzo,
+                        descrizione: s.descrizione,
+                        immagineUrl: s.immagini?.[0]?.url ?? null,
                     }]
             ))
         );
