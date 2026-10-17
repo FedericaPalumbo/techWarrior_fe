@@ -6,12 +6,13 @@ import { Proposta, Segnalazione } from '../entities';
 
 // autoreId non si manda: il back lo ricava dal token JWT (come createdBy in EsameJavaScript).
 // "foto" è il File originale scelto dall'utente (PNG, JPEG...), senza nessuna conversione.
+// descrizione e foto sono facoltative: se mancano non vengono inviate.
 // Latitudine e longitudine non si mandano: le ricava il back dall'indirizzo (geocodifica).
 export type CreateSegnalazionePayload = {
     titolo: string,
-    descrizione: string,
+    descrizione?: string,
     indirizzo: string,
-    foto: File
+    foto?: File | null
 };
 
 export type CreatePropostaPayload = {
@@ -39,15 +40,19 @@ export class SegnalazioneService {
     }
 
     // CONTRATTO CON IL BACK (da concordare col team): multipart/form-data con i campi
-    // titolo, descrizione, indirizzo, foto (file).
+    // titolo, indirizzo (obbligatori) e descrizione, foto (file) (facoltativi).
     // Il back ricava latitudine/longitudine dall'indirizzo, valida il file, lo salva e scrive l'url in segnalazione_immagini.
     // Non impostare Content-Type a mano: il browser aggiunge il boundary da solo.
     create(payload: CreateSegnalazionePayload) {
         const body = new FormData();
         body.append('titolo', payload.titolo);
-        body.append('descrizione', payload.descrizione);
+        if (payload.descrizione) {
+            body.append('descrizione', payload.descrizione);
+        }
         body.append('indirizzo', payload.indirizzo);
-        body.append('foto', payload.foto, payload.foto.name);
+        if (payload.foto) {
+            body.append('foto', payload.foto, payload.foto.name);
+        }
 
         return this.http.post<Segnalazione>(this.baseUrl, body);
     }

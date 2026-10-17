@@ -59,6 +59,8 @@
     flex-direction: column;
     min-width: 0;
     min-height: 170px;
+    /* parole molto lunghe vanno a capo invece di allargare la card */
+    overflow-wrap: anywhere;
 }
 
 .titolo {
@@ -129,4 +131,69 @@
 .btn-partecipa:focus-visible {
     outline: 3px solid #fff;
     outline-offset: 2px;
+}
+
+
+/* ---------- Tablet ---------- */
+@media (max-width: 768px) {
+    .card-invito {
+        gap: 16px;
+    }
+
+    .foto {
+        flex-basis: 220px;
+    }
+
+    .titolo {
+        font-size: 1.1rem;
+    }
+}
+
+/* ---------- Mobile: la card diventa verticale (foto sopra, testi sotto) ---------- */
+@media (max-width: 600px) {
+    .card-invito {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    /* sulla colonna "flex: 0 0 300px" varrebbe come altezza: lo azzero */
+    .foto {
+        flex: none;
+        width: 100%;
+        height: auto;
+    }
+
+    .foto img,
+    .foto-placeholder {
+        height: auto;
+        aspect-ratio: 16 / 9;
+    }
+
+    .contenuto {
+        min-height: 0;
+    }
+
+    .descrizione {
+        -webkit-line-clamp: 4;
+        line-clamp: 4;
+    }
+
+    /* numero volontari sopra, pulsante a tutta larghezza sotto */
+    .piede {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .btn-partecipa {
+        width: 100%;
+        margin-left: 0;
+        padding: 10px 24px;
+    }
+
+    /* su touch l'effetto "sollevato" non serve */
+    .card-invito:hover,
+    .btn-partecipa:hover {
+        transform: none;
+    }
 }

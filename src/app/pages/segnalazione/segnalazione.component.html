@@ -1,71 +1,108 @@
-<h1>Nuova segnalazione</h1>
+<section class="pagina">
 
-@if (inviata()) {
-<p>Segnalazione inviata, grazie!</p>
-}
-@if (avviso()) {
-<p>{{ avviso() }}</p>
-}
-
-<form [formGroup]="form" (ngSubmit)="invia()" novalidate>
-
-    <!-- TITOLO (obbligatorio, almeno 3 caratteri) -->
-    <div>
-        <label for="titolo">Titolo *</label>
-        <input id="titolo" type="text" formControlName="titolo" maxlength="100" />
-        @if (form.controls.titolo.touched && form.controls.titolo.invalid) {
-        <p>Il titolo è obbligatorio (almeno 3 caratteri).</p>
-        }
-    </div>
-
-    <!-- FOTO (obbligatoria). Il file va al back così com'è (PNG, JPEG, WEBP, max 5 MB): salvataggio lo gestisce lui -->
-    <div>
-        <label for="foto">Foto del problema *</label>
-        <input #fileInput id="foto" type="file" accept="image/png,image/jpeg,image/webp"
-            (change)="onFotoSelezionata($event)" />
-        @if (fotoErrore()) {
-        <p>{{ fotoErrore() }}</p>
-        }
-        @if (anteprima(); as src) {
-        <div>
-            <img [src]="src" alt="Anteprima della foto" width="240" />
-            <button type="button" (click)="rimuoviFoto()">Rimuovi foto</button>
-        </div>
-        } @else if (tentativoInvio()) {
-        <p>Devi allegare una foto del problema.</p>
-        }
-    </div>
-
-    <!-- INDIRIZZO (obbligatorio): il back lo trasforma in latitudine/longitudine per la mappa -->
-    <div>
-        <label for="indirizzo">Indirizzo *</label>
-        <input id="indirizzo" type="text" formControlName="indirizzo" maxlength="255"
-            placeholder="es. Via Roma 10, Vicenza" />
-        @if (form.controls.indirizzo.touched && form.controls.indirizzo.invalid) {
-        <p>L'indirizzo è obbligatorio (meglio se con il comune).</p>
-        }
-    </div>
-
-    <!-- DESCRIZIONE (obbligatoria) -->
-    <div>
-        <label for="descrizione">Descrizione *</label>
-        <textarea id="descrizione" formControlName="descrizione" rows="4" maxlength="2000"></textarea>
-        @if (form.controls.descrizione.touched && form.controls.descrizione.invalid) {
-        <p>La descrizione è obbligatoria.</p>
-        }
-    </div>
-
-    <!-- SOLUZIONE (facoltativa) -> proposte_segnalazione -->
-    <div>
-        <label for="soluzione">Come si potrebbe risolvere? (facoltativa)</label>
-        <textarea id="soluzione" formControlName="soluzione" rows="4"></textarea>
-    </div>
-
-    @if (errore()) {
-    <p>{{ errore() }}</p>
+    @if (inviata()) {
+    <p class="messaggio messaggio-ok" role="status">Segnalazione inviata, grazie!</p>
+    }
+    @if (avviso()) {
+    <p class="messaggio messaggio-avviso" role="status">{{ avviso() }}</p>
     }
 
-    <button type="submit" [disabled]="inviando()">
-        @if (inviando()) { Invio in corso... } @else { Invia segnalazione }
-    </button>
-</form>
+    <form [formGroup]="form" (ngSubmit)="invia()" novalidate>
+
+        <!-- 1) ZONA: indirizzo (compilato in automatico dalla posizione) + mappa con pin spostabile -->
+        <div class="zona">
+            <h1 class="titolo-pagina">Seleziona la zona</h1>
+
+            <div class="ricerca">
+                <label class="visually-hidden" for="indirizzo">Indirizzo della segnalazione</label>
+                <input id="indirizzo" type="text" formControlName="indirizzo" maxlength="255"
+                    placeholder="es. Via Roma 10, Vicenza" (keydown.enter)="cercaIndirizzo($event)" />
+                <button type="button" class="ricerca-btn" aria-label="Cerca l'indirizzo sulla mappa"
+                    [disabled]="indirizzoInCerca()" (click)="cercaIndirizzo()">
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" aria-hidden="true">
+                        <circle cx="10.5" cy="10.5" r="6.5" />
+                        <path d="M15.5 15.5 21 21" />
+                    </svg>
+                </button>
+            </div>
+
+            @if (form.controls.indirizzo.touched && form.controls.indirizzo.invalid) {
+            <p class="messaggio-zona">L'indirizzo è obbligatorio: usa la posizione corrente o cercalo qui sopra.</p>
+            }
+            @if (avvisoZona()) {
+            <p class="messaggio-zona">{{ avvisoZona() }}</p>
+            }
+            @if (fuoriComune()) {
+            <p class="messaggio-zona">Questo punto è fuori dal territorio del comune: la segnalazione non comparirà
+                sulla
+                mappa.</p>
+            }
+
+            <app-mappa-scelta [posizione]="posizione()" [gpsInCorso]="gpsInCorso()"
+                (posizioneScelta)="impostaPosizione($event)" (posizioneCorrenteRichiesta)="usaPosizioneCorrente()" />
+
+            <p class="suggerimento-mappa">Clicca sulla mappa o trascina il pin per spostare il punto della segnalazione.
+            </p>
+        </div>
+
+        <!-- 2) CARD: descrizione del problema -->
+        <div class="card-form">
+            <h2 class="titolo-card">Descrivi il problema</h2>
+
+            <!-- TITOLO (obbligatorio, almeno 3 caratteri) -->
+            <div class="campo">
+                <label for="titolo">Titolo <span class="obbligatorio">*</span></label>
+                <input id="titolo" type="text" formControlName="titolo" maxlength="100"
+                    placeholder="es. Buca pericolosa in strada" />
+                @if (form.controls.titolo.touched && form.controls.titolo.invalid) {
+                <p class="errore-campo">Il titolo è obbligatorio (almeno 3 caratteri).</p>
+                }
+            </div>
+
+            <!-- DESCRIZIONE (facoltativa) -->
+            <div class="campo">
+                <label for="descrizione">Descrizione <span class="facoltativo">(facoltativa)</span></label>
+                <textarea id="descrizione" formControlName="descrizione" rows="3" maxlength="2000"></textarea>
+            </div>
+
+            <!-- SOLUZIONE (facoltativa) -> proposte_segnalazione -->
+            <div class="campo">
+                <label for="soluzione">Proposta di soluzione <span class="facoltativo">(facoltativa)</span></label>
+                <textarea id="soluzione" formControlName="soluzione" rows="3"
+                    placeholder="Come si potrebbe risolvere?"></textarea>
+            </div>
+
+            <!-- FOTO (facoltativa). Il file va al back così com'è (PNG, JPEG, WEBP, max 5 MB) -->
+            <div class="campo">
+                <span class="etichetta">Foto del problema <span class="facoltativo">(facoltativa)</span></span>
+
+                <!-- l'input vero è nascosto: la label qui sotto fa da pulsante -->
+                <input #fileInput id="foto" class="foto-input" type="file" accept="image/png,image/jpeg,image/webp"
+                    (change)="onFotoSelezionata($event)" />
+                <label for="foto" class="foto-area">
+                    {{ anteprima() ? 'Cambia foto' : 'Aggiungi una foto' }}
+                </label>
+
+                @if (fotoErrore()) {
+                <p class="errore-campo">{{ fotoErrore() }}</p>
+                }
+                @if (anteprima(); as src) {
+                <div class="foto-anteprima">
+                    <img [src]="src" alt="Anteprima della foto" />
+                    <button type="button" class="btn-rimuovi" (click)="rimuoviFoto()">Rimuovi foto</button>
+                </div>
+                }
+            </div>
+
+            @if (errore()) {
+            <p class="messaggio messaggio-errore" role="alert">{{ errore() }}</p>
+            }
+
+            <button type="submit" class="btn-invia" [disabled]="inviando() || form.invalid">
+                @if (inviando()) { Invio in corso... } @else { Invia }
+            </button>
+            <p class="nota">I campi con <span class="obbligatorio">*</span> sono obbligatori.</p>
+        </div>
+    </form>
+</section>

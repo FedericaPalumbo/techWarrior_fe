@@ -1,0 +1,347 @@
+/* Pagina "Nuova segnalazione".
+   Colori e font arrivano da src/styles.css (--myc-viola, --myc-viola-scuro, --myc-lavanda, --myc-testo). */
+
+/* Sfondo viola a tutta pagina (72px = altezza della navbar) */
+:host {
+    display: block;
+    min-height: calc(100vh - 72px);
+    padding: 40px 24px 56px;
+    box-sizing: border-box;
+    background: linear-gradient(180deg, #a3a1cc 0%, var(--myc-lavanda) 100%);
+}
+
+.pagina {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Desktop: zona (ricerca + mappa) a sinistra, card del form a destra */
+form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
+}
+
+/* ---------- 1) Zona ---------- */
+
+.zona {
+    /* altezza della mappa (letta da app-mappa-scelta) */
+    --altezza-mappa: 460px;
+}
+
+.titolo-pagina {
+    margin: 0 0 16px;
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Barra di ricerca bianca con lente a destra */
+.ricerca {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 0 8px 0 18px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(60, 40, 110, 0.18);
+}
+
+.ricerca:focus-within {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6), 0 4px 14px rgba(60, 40, 110, 0.18);
+}
+
+.ricerca input {
+    flex: 1;
+    min-width: 0;
+    height: 52px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--myc-testo);
+    font: inherit;
+    font-size: 1rem;
+}
+
+.ricerca-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--myc-testo);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.ricerca-btn:hover:not(:disabled) {
+    background: #f1edf8;
+    color: var(--myc-viola);
+}
+
+.ricerca-btn:disabled {
+    opacity: 0.5;
+    cursor: progress;
+}
+
+.ricerca-btn:focus-visible {
+    outline: 3px solid var(--myc-viola);
+    outline-offset: 1px;
+}
+
+/* Avvisi sotto la barra (GPS negato, indirizzo non trovato, fuori comune) */
+.messaggio-zona {
+    margin: -6px 0 12px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: #fef3c7;
+    color: #78350f;
+    font-size: 0.85rem;
+}
+
+.suggerimento-mappa {
+    margin: 10px 4px 0;
+    color: #fff;
+    font-size: 0.8rem;
+    text-align: center;
+    opacity: 0.9;
+}
+
+/* ---------- 2) Card "Descrivi il problema" ---------- */
+
+.card-form {
+    padding: 28px;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(60, 40, 110, 0.25);
+}
+
+.titolo-card {
+    margin: 0 0 20px;
+    color: var(--myc-viola);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.campo {
+    margin-bottom: 18px;
+}
+
+.campo label,
+.etichetta {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--myc-viola-scuro);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.obbligatorio {
+    color: #c0392b;
+}
+
+.facoltativo {
+    color: #8a869c;
+    font-weight: 400;
+}
+
+.campo input[type='text'],
+.campo textarea {
+    display: block;
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #d9d5e6;
+    border-radius: 12px;
+    background: #fff;
+    color: var(--myc-testo);
+    font: inherit;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.campo textarea {
+    resize: vertical;
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+    color: #a9a5ba;
+}
+
+.campo input[type='text']:focus,
+.campo textarea:focus {
+    outline: 0;
+    border-color: var(--myc-viola);
+    box-shadow: 0 0 0 3px rgba(111, 66, 176, 0.18);
+}
+
+/* Angular aggiunge da solo ng-invalid + ng-touched: nessuna classe da gestire nell'html */
+.campo input.ng-invalid.ng-touched,
+.campo textarea.ng-invalid.ng-touched {
+    border-color: #c0392b;
+}
+
+.errore-campo {
+    margin: 6px 0 0;
+    color: #c0392b;
+    font-size: 0.8rem;
+}
+
+/* ---------- Foto ---------- */
+
+/* input file nascosto ma raggiungibile da tastiera (la label fa da pulsante) */
+.foto-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.foto-area {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    margin: 0 !important;
+    padding: 14px;
+    border: 2px dashed var(--myc-lavanda);
+    border-radius: 14px;
+    color: var(--myc-viola) !important;
+    font-size: 0.95rem !important;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.foto-area:hover {
+    border-color: var(--myc-viola);
+    background: #f6f2fc;
+}
+
+.foto-input:focus-visible+.foto-area {
+    border-color: var(--myc-viola);
+    box-shadow: 0 0 0 3px rgba(111, 66, 176, 0.25);
+}
+
+.foto-anteprima {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.foto-anteprima img {
+    width: 110px;
+    height: 110px;
+    border-radius: 14px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(60, 40, 110, 0.25);
+}
+
+.btn-rimuovi {
+    padding: 6px 16px;
+    border: 1px solid var(--myc-viola);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--myc-viola);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-rimuovi:hover {
+    background: var(--myc-viola);
+    color: #fff;
+}
+
+/* ---------- Invio e messaggi ---------- */
+
+.btn-invia {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 13px 24px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--myc-viola);
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.btn-invia:hover:not(:disabled) {
+    background: var(--myc-viola-scuro);
+    transform: translateY(-1px);
+}
+
+.btn-invia:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-invia:focus-visible {
+    outline: 3px solid rgba(111, 66, 176, 0.4);
+    outline-offset: 2px;
+}
+
+.nota {
+    margin: 12px 0 0;
+    color: #8a869c;
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+/* Messaggi di esito: inviata / avviso / errore */
+.messaggio {
+    margin: 0 0 16px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.messaggio-ok {
+    background: #dcfce7;
+    color: #14532d;
+}
+
+.messaggio-avviso {
+    background: #fef3c7;
+    color: #78350f;
+}
+
+.messaggio-errore {
+    background: #fee2e2;
+    color: #7f1d1d;
+}
+
+/* ---------- Responsive (telefono / tablet): colonna singola stretta ---------- */
+@media (max-width: 900px) {
+    :host {
+        padding: 24px 16px 40px;
+    }
+
+    .pagina {
+        max-width: 560px;
+    }
+
+    form {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .zona {
+        --altezza-mappa: 300px;
+    }
+
+    .card-form {
+        padding: 24px 20px;
+    }
+}

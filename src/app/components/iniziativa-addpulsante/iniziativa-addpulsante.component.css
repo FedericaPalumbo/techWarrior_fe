@@ -7,6 +7,7 @@ button {
     box-shadow: 0 4px 14px rgba(60, 40, 110, 0.25);
     color: #fff;
     font-weight: 700;
+    white-space: nowrap;
     cursor: pointer;
     transition: background 0.2s, transform 0.2s;
 }
@@ -14,4 +15,12 @@ button {
 button:hover {
     background: var(--myc-viola);
     transform: translateY(-2px);
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 600px) {
+    button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
 }

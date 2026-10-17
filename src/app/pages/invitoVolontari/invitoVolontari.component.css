@@ -47,3 +47,20 @@
     color: #fff;
     font-weight: 600;
 }
+
+
+/* ---------- Mobile ---------- */
+@media (max-width: 600px) {
+    .inviti {
+        padding: 16px 12px 32px;
+    }
+
+    .intestazione-pagina {
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .intestazione-pagina h1 {
+        font-size: 1.3rem;
+    }
+}

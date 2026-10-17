@@ -1,0 +1,7 @@
+<div class="mappa-wrapper">
+    <div #mappa class="mappa"></div>
+
+    <button type="button" class="btn-posizione" [disabled]="gpsInCorso()" (click)="posizioneCorrenteRichiesta.emit()">
+        {{ gpsInCorso() ? 'Cerco la tua posizione…' : 'usa posizione corrente' }}
+    </button>
+</div>
