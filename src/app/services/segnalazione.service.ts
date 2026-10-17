@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Proposta, Segnalazione, SegnalazioneMappa } from '../entities';
 
 // autoreId non si manda: il back lo ricava dal token JWT (come createdBy in EsameJavaScript).
