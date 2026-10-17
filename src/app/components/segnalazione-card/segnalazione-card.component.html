@@ -1,12 +1,54 @@
-<article tabindex="0" (click)="goToDetail()" (keydown.enter)="goToDetail()">
-    <h2>{{ segnalazione().titolo }}</h2>
+<article class="card-segnalazione" [class.espansa]="espansa()" tabindex="0" [attr.aria-expanded]="espansa()"
+    (click)="toggle()" (keydown.enter)="onEnter($event)">
+    <h2 class="intestazione">Nuova segnalazione {{ segnalazione().indirizzo }}</h2>
 
-    @if (immagine(); as src) {
-    <img [src]="src" [alt]="segnalazione().titolo">
-    }
+    <div class="foto">
+        @if (immagine(); as src) {
+        <img [src]="src" [alt]="segnalazione().titolo">
+        }
+        <!-- il pin apre la mappa -->
+        <button type="button" class="pin" aria-label="Vedi sulla mappa" [disabled]="segnalazione().latitudine === null"
+            (click)="vaiAllaMappa($event)">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                <circle cx="12" cy="9" r="3" fill="#fff" />
+            </svg>
+        </button>
+    </div>
 
-    <p>{{ dettagli() }}</p>
+    <h3 class="titolo">{{ segnalazione().titolo }}</h3>
+    <p class="descrizione">{{ segnalazione().descrizione }}</p>
 
-    <!-- TODO: da collegare quando il back avrà l'endpoint per dare la disponibilità come volontario -->
-    <button type="button" (click)="partecipi($event)">Partecipi ?</button>
+    <div class="piede">
+        <time [attr.datetime]="segnalazione().createdAt">{{ data() }}</time>
+
+        <div class="voti">
+            <button type="button" aria-label="Pollice in su" [class.attivo]="voto() === 'su'"
+                [attr.aria-pressed]="voto() === 'su'" (click)="vota($event, 'su')">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                        d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+                </svg>
+            </button>
+            <span class="punteggio">{{ punteggio() }}</span>
+            <button type="button" aria-label="Pollice in giù" [class.attivo]="voto() === 'giu'"
+                [attr.aria-pressed]="voto() === 'giu'" (click)="vota($event, 'giu')">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                        d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- campo facoltativo: compare quando la card è espansa -->
+    <div class="suggerimenti" [attr.inert]="espansa() ? null : ''" (click)="$event.stopPropagation()">
+        <div class="suggerimenti-interno">
+            <div class="box-suggerimenti">
+                <textarea rows="3" placeholder="Suggerimenti per risolvere il problema..." [value]="suggerimento()"
+                    (input)="scrivi($event)"></textarea>
+                <button type="button" class="invia" [disabled]="!puoInviare()" (click)="invia()">Invia</button>
+            </div>
+        </div>
+    </div>
 </article>

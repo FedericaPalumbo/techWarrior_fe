@@ -1,0 +1,99 @@
+:host {
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    display: block;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.barra {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 14px 20px;
+}
+
+.logo {
+    text-decoration: none;
+}
+
+.logo-placeholder {
+    color: var(--myc-viola-scuro);
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+/* Hamburger: tre barre viola */
+.hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 38px;
+    padding: 6px 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.hamburger span {
+    display: block;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--myc-viola-scuro);
+}
+
+/* Menu a tendina */
+.menu {
+    position: absolute;
+    top: 100%;
+    right: 12px;
+    min-width: 230px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(60, 40, 110, 0.25);
+}
+
+.citta {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--myc-lavanda);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.menu ul {
+    margin: 0 0 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.menu li a {
+    display: block;
+    padding: 6px 0;
+    color: var(--myc-testo);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.menu li a:hover,
+.menu li a.active {
+    color: var(--myc-viola);
+}
+
+/* Accedi / Registrati quando non si è loggati */
+.auth {
+    display: flex;
+    gap: 16px;
+}
+
+.auth a {
+    color: var(--myc-viola-scuro);
+    font-weight: 700;
+    text-decoration: none;
+}

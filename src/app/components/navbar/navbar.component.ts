@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
@@ -17,7 +17,7 @@ import { IfRoleDirective } from '../../utils/if-role.directive';
         IfRoleDirective,
     ],
     templateUrl: './navbar.component.html',
-    // styleUrl: './navbar.component.css',  // lo aggiungi quando farai il css
+    styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
     private authSrv = inject(AuthService);
@@ -40,7 +40,19 @@ export class NavbarComponent {
     // nelle pagine di login e registrazione i pulsanti Accedi/Registrati in navbar sono superflui
     showAuthBtns = computed(() => !['/login', '/register'].includes(this.currentPath()));
 
+    // menu a tendina aperto dall'hamburger
+    menuAperto = signal(false);
+
+    toggleMenu() {
+        this.menuAperto.update(valore => !valore);
+    }
+
+    chiudiMenu() {
+        this.menuAperto.set(false);
+    }
+
     logout() {
+        this.chiudiMenu();
         this.authSrv.logout();
         // vado direttamente al login: restare sulla pagina corrente non rieseguirebbe la guard
         // (Angular riusa la rotta) e la pagina resterebbe visibile

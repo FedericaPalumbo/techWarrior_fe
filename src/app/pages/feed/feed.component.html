@@ -1,12 +1,6 @@
-<!-- TODO: header del mockup (città "Vicenza", icona profilo, menu) -> andrà nella navbar -->
-<div>
-    <header>
-        <h1>Feed</h1>
-        <a routerLink="/segnalazione">+ Nuova segnalazione</a>
-    </header>
-
+<section class="feed">
     @if (errorMessage()) {
-    <div role="alert">
+    <div class="errore" role="alert">
         <p>{{ errorMessage() }}</p>
         <button type="button" (click)="ricarica()">Riprova</button>
     </div>
@@ -14,17 +8,18 @@
 
     @let segnalazioni = segnalazioni$ | async;
     @if (segnalazioni) {
-    <div>
-        @for (segnalazione of segnalazioni; track segnalazione.id) {
-        <app-segnalazione-card [segnalazione]="segnalazione" (onDetail)="navigateToDetail(segnalazione.id)"
-            (onPartecipi)="partecipi(segnalazione.id)" />
-        } @empty {
-        @if (!errorMessage()) {
-        <p>Nessuna segnalazione per ora.</p>
-        }
-        }
-    </div>
-    } @else {
-    <p>Caricamento...</p>
+    @for (segnalazione of segnalazioni; track segnalazione.id) {
+    <app-segnalazione-card [segnalazione]="segnalazione" (onMappa)="vaiAllaMappa(segnalazione.id)"
+        (onVota)="vota(segnalazione.id, $event)" (onSuggerimento)="inviaSuggerimento(segnalazione.id, $event)" />
+    } @empty {
+    @if (!errorMessage()) {
+    <p class="stato">Nessuna segnalazione per ora.</p>
     }
-</div>
+    }
+    } @else {
+    <p class="stato">Caricamento...</p>
+    }
+
+    <!-- resta fisso in basso mentre si scorre -->
+    <a class="btn-segnala" routerLink="/segnalazione">Fai una segnalazione</a>
+</section>

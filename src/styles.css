@@ -1,1 +1,20 @@
-/* You can add global styles to this file, and also import other style files */
+/* Stili globali di MyC (techWarrior). Caricato DOPO bootstrap, quindi sovrascrive i suoi default. */
+
+:root {
+    --myc-viola: #6f42b0;
+    /* card */
+    --myc-viola-scuro: #5a2d91;
+    /* logo, hamburger, testi su sfondo chiaro */
+    --myc-lavanda: #8e8bb5;
+    /* pin e pulsante "Fai una segnalazione" */
+    --myc-testo: #2b2340;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--myc-testo);
+    /* sfondo chiaro sfumato come nel mockup */
+    background: linear-gradient(160deg, #f6f8f8 0%, #e4edec 45%, #f8f7fb 100%) fixed;
+}

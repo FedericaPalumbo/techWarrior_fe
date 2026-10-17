@@ -1,9 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { BehaviorSubject, catchError, of, switchMap, tap } from 'rxjs';
 import { SegnalazioneService } from '../../services/segnalazione.service';
-import { SegnalazioneCardComponent } from '../../components/segnalazione-card/segnalazione-card.component';
+import { SegnalazioneCardComponent, Voto } from '../../components/segnalazione-card/segnalazione-card.component';
 
 @Component({
     selector: 'app-feed',
@@ -13,11 +14,12 @@ import { SegnalazioneCardComponent } from '../../components/segnalazione-card/se
         RouterLink,
     ],
     templateUrl: './feed.component.html',
-    // styleUrl: './feed.component.css',  // lo aggiungi quando farai il css
+    styleUrl: './feed.component.css',
 })
 export class FeedComponent {
     protected segnalazioneSrv = inject(SegnalazioneService);
     protected router = inject(Router);
+    private destroyRef = inject(DestroyRef);
 
     errorMessage = signal<string | null>(null);
 
@@ -39,13 +41,24 @@ export class FeedComponent {
         this.reload$.next();
     }
 
-    navigateToDetail(id: number) {
-        // TODO: la pagina di dettaglio non esiste ancora (la rotta 'segnalazione' è il form di creazione)
-        this.router.navigate(['/segnalazioni', id]);
+    // il pin della card apre la mappa; la mappa potrà leggere ?segnalazione=<id> per centrarsi sul pin
+    vaiAllaMappa(id: number) {
+        this.router.navigate(['/mappa'], { queryParams: { segnalazione: id } });
     }
 
-    partecipi(id: number) {
-        // TODO: da collegare al back quando ci sarà l'endpoint per i volontari
-        console.log('Partecipi alla segnalazione', id);
+    vota(id: number, voto: Voto) {
+        // TODO: da collegare al back (tabella voti_segnalazione) quando ci sarà l'endpoint dei voti
+        console.log('Voto alla segnalazione', id, voto);
+    }
+
+    // il suggerimento è una riga di proposte_segnalazione (addProposta esiste già nel service)
+    inviaSuggerimento(id: number, descrizione: string) {
+        this.segnalazioneSrv.addProposta(id, { descrizione })
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                error: response => this.errorMessage.set(
+                    response.error?.message ?? 'Non è stato possibile inviare il suggerimento'
+                ),
+            });
     }
 }

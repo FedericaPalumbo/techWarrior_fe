@@ -1,0 +1,11 @@
+footer {
+    /* il padding in basso evita che il pulsante fisso "Fai una segnalazione" copra il testo */
+    padding: 24px 20px 100px;
+    color: var(--myc-lavanda);
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+footer p {
+    margin: 0 0 4px;
+}
