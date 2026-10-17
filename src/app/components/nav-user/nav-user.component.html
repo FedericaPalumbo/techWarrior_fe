@@ -1,6 +1,9 @@
-<div>
+<div class="utente">
     <!-- TODO: icona profilo del mockup -->
-    <span>{{ user().firstName }} {{ user().lastName }}</span>
-    <span>{{ ruolo() }}</span>
+    <!-- nome in alto, ruolo sotto -->
+    <div class="info">
+        <span class="nome">{{ user().firstName }} {{ user().lastName }}</span>
+        <span class="ruolo">{{ ruolo() }}</span>
+    </div>
     <button type="button" aria-label="Esci" (click)="logout()">Esci</button>
 </div>

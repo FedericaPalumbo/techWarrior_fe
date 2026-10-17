@@ -3,7 +3,6 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SegnalazioneMappa } from '../entities';
 import { Proposta, Segnalazione } from '../entities';
-import { BehaviorSubject, catchError, map, of, switchMap, tap } from 'rxjs';
 
 // autoreId non si manda: il back lo ricava dal token JWT (come createdBy in EsameJavaScript).
 // "foto" è il File originale scelto dall'utente (PNG, JPEG...), senza nessuna conversione.

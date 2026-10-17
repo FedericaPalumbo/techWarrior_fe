@@ -7,25 +7,38 @@
     backdrop-filter: blur(8px);
 }
 
+/* Barra a tutta larghezza: il logo sta vicino al bordo sinistro, l'hamburger a quello destro */
 .barra {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 520px;
-    margin: 0 auto;
-    padding: 14px 20px;
+    padding: 10px 20px;
+}
+
+/* Logo + città vicini */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .logo {
+    display: flex;
+    align-items: center;
     text-decoration: none;
 }
 
-.logo-placeholder {
-    color: var(--myc-viola-scuro);
-    font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: -1px;
+.logo-img {
+    display: block;
+    height: 36px;
+    width: auto;
+}
+
+.citta {
+    color: var(--myc-lavanda);
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 /* Hamburger: tre barre viola */
@@ -66,14 +79,6 @@
     display: block;
 }
 
-.citta {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--myc-lavanda);
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
 .menu ul {
     margin: 0 0 10px;
     padding: 0;
@@ -96,38 +101,40 @@
 /* ---------- Tablet / desktop: niente hamburger, la nav bar è sempre in linea ---------- */
 @media (min-width: 768px) {
     .barra {
-        max-width: 1100px;
+        padding: 10px 24px;
     }
 
     .hamburger {
         display: none;
     }
 
+    /* il contenitore del menu "sparisce": ul e .destra diventano figli flex diretti della barra */
     .menu,
     .menu.aperto {
-        position: static;
-        display: flex;
-        align-items: center;
-        gap: 28px;
-        min-width: 0;
-        max-width: none;
-        padding: 0;
-        border-radius: 0;
-        background: none;
-        box-shadow: none;
+        display: contents;
     }
 
-    .citta {
-        margin: 0;
+    /* sinistra e destra occupano lo stesso spazio (flex: 1), così i link restano
+       davvero al centro della barra, qualunque sia la larghezza di nome e logo */
+    .brand {
+        flex: 1;
+    }
+
+    .destra {
+        display: flex;
+        flex: 1;
+        justify-content: flex-end;
     }
 
     .menu ul {
         display: flex;
-        gap: 22px;
+        justify-content: center;
+        gap: clamp(16px, 3vw, 48px);
         margin: 0;
     }
 
     .menu li a {
         padding: 4px 0;
+        white-space: nowrap;
     }
 }
