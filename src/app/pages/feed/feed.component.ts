@@ -2,9 +2,10 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
-import { BehaviorSubject, catchError, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, map, of, switchMap, tap } from 'rxjs';
 import { SegnalazioneService } from '../../services/segnalazione.service';
 import { SegnalazioneCardComponent, Voto } from '../../components/segnalazione-card/segnalazione-card.component';
+
 
 @Component({
     selector: 'app-feed',
@@ -29,8 +30,9 @@ export class FeedComponent {
     segnalazioni$ = this.reload$.pipe(
         tap(() => this.errorMessage.set(null)),
         switchMap(() => this.segnalazioneSrv.find().pipe(
+            tap(res => console.log('feed response', res)),   // <-- il log
+            map((res: any) => Array.isArray(res) ? res : (res?.data ?? [])),
             catchError(response => {
-                // se manca il messaggio del BE (ad esempio server spento, status 0) uso un testo generico
                 this.errorMessage.set(response.error?.message ?? 'Si è verificato un errore, riprova più tardi');
                 return of([]);
             })

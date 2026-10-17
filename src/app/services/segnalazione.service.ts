@@ -35,18 +35,6 @@ export class SegnalazioneService {
         return this.http.get<Segnalazione[]>(this.baseUrl);
     }
 
-    segnalazioni$ = this.reload$.pipe(
-        tap(() => this.errorMessage.set(null)),
-        switchMap(() => this.segnalazioneSrv.find().pipe(
-            tap(res => console.log('feed response', res)),   // <-- il log
-            map((res: any) => Array.isArray(res) ? res : (res?.data ?? [])),
-            catchError(response => {
-                this.errorMessage.set(response.error?.message ?? 'Si è verificato un errore, riprova più tardi');
-                return of([]);
-            })
-        ))
-    );
-
     // Lista leggera per la mappa (solo id, titolo, stato, coordinate)
     findPerMappa(): Observable<SegnalazioneMappa[]> {
         return this.http.get<SegnalazioneMappa[]>('/api/segnalazioni/mappa');
