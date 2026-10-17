@@ -6,11 +6,11 @@ import { Proposta, Segnalazione } from '../entities';
 
 // autoreId non si manda: il back lo ricava dal token JWT (come createdBy in EsameJavaScript).
 // "foto" è il File originale scelto dall'utente (PNG, JPEG...), senza nessuna conversione.
+// Latitudine e longitudine non si mandano: le ricava il back dall'indirizzo (geocodifica).
 export type CreateSegnalazionePayload = {
     titolo: string,
-    descrizione?: string,
-    latitudine: number,
-    longitudine: number,
+    descrizione: string,
+    indirizzo: string,
     foto: File
 };
 
@@ -37,19 +37,16 @@ export class SegnalazioneService {
     findPerMappa(): Observable<SegnalazioneMappa[]> {
         return this.http.get<SegnalazioneMappa[]>('/api/segnalazioni/mappa');
     }
+
     // CONTRATTO CON IL BACK (da concordare col team): multipart/form-data con i campi
-    // titolo, descrizione?, latitudine, longitudine, foto (file).
-    // Il back valida il file, lo converte/salva e scrive l'url in segnalazione_immagini.
+    // titolo, descrizione, indirizzo, foto (file).
+    // Il back ricava latitudine/longitudine dall'indirizzo, valida il file, lo salva e scrive l'url in segnalazione_immagini.
     // Non impostare Content-Type a mano: il browser aggiunge il boundary da solo.
     create(payload: CreateSegnalazionePayload) {
         const body = new FormData();
         body.append('titolo', payload.titolo);
-        if (payload.descrizione) {
-            body.append('descrizione', payload.descrizione);
-        }
-        // FormData manda solo stringhe: il back le riconverte in numeri
-        body.append('latitudine', String(payload.latitudine));
-        body.append('longitudine', String(payload.longitudine));
+        body.append('descrizione', payload.descrizione);
+        body.append('indirizzo', payload.indirizzo);
         body.append('foto', payload.foto, payload.foto.name);
 
         return this.http.post<Segnalazione>(this.baseUrl, body);

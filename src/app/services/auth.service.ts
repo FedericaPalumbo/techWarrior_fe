@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { catchError, finalize, map, Observable, of, shareReplay, tap } from 'rxjs';
 import { JwtService } from './jwt.service';
@@ -92,9 +92,13 @@ export class AuthService {
             this.pendingFetch$ = this.http.get<UtenteApi>('/api/users/profile')
                 .pipe(
                     map(toUser),
-                    catchError(() => {
-                        this.jwtSrv.removeToken();
-                        return of(null)
+                    catchError((err: HttpErrorResponse) => {
+                        // Solo con 401 la sessione non è più valida (l'interceptor ha già provato a rinnovarla).
+                        // Con altri errori (server spento, rete assente) non butto fuori l'utente.
+                        if (err.status === 401) {
+                            this.clearSession();
+                        }
+                        return of(null);
                     }),
                     tap(user => this._currentUser.set(user)),
                     finalize(() => this.pendingFetch$ = null),

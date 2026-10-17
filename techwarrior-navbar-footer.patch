@@ -1,0 +1,317 @@
+diff --git a/src/app/app.html b/src/app/app.html
+index 90c6b64..28dca81 100644
+--- a/src/app/app.html
++++ b/src/app/app.html
+@@ -1 +1,3 @@
+-<router-outlet></router-outlet>
+\ No newline at end of file
++<app-navbar></app-navbar>
++<router-outlet></router-outlet>
++<app-footer></app-footer>
+diff --git a/src/app/app.ts b/src/app/app.ts
+index ec6280d..3fe35ed 100644
+--- a/src/app/app.ts
++++ b/src/app/app.ts
+@@ -1,9 +1,11 @@
+ import { Component, signal } from '@angular/core';
+ import { RouterOutlet } from '@angular/router';
++import { NavbarComponent } from './components/navbar/navbar.component';
++import { FooterComponent } from './components/footer/footer.component';
+ 
+ @Component({
+   selector: 'app-root',
+-  imports: [RouterOutlet],
++  imports: [RouterOutlet, NavbarComponent, FooterComponent],
+   templateUrl: './app.html',
+   styleUrl: './app.css'
+ })
+diff --git a/src/app/components/footer/footer.component.html b/src/app/components/footer/footer.component.html
+index e69de29..09c88a5 100644
+--- a/src/app/components/footer/footer.component.html
++++ b/src/app/components/footer/footer.component.html
+@@ -0,0 +1,4 @@
++<footer>
++    <p>TechWarrior: segnala i problemi della tua città, vota i più urgenti e rendi disponibile il tuo aiuto come volontario.</p>
++    <p>&copy; {{ anno }} TechWarrior</p>
++</footer>
+diff --git a/src/app/components/footer/footer.component.ts b/src/app/components/footer/footer.component.ts
+index e69de29..ff68f67 100644
+--- a/src/app/components/footer/footer.component.ts
++++ b/src/app/components/footer/footer.component.ts
+@@ -0,0 +1,10 @@
++import { Component } from '@angular/core';
++
++@Component({
++    selector: 'app-footer',
++    templateUrl: './footer.component.html',
++    // styleUrl: './footer.component.css',  // lo aggiungi quando farai il css
++})
++export class FooterComponent {
++    protected readonly anno = new Date().getFullYear();
++}
+diff --git a/src/app/components/nav-user/nav-user.component.css b/src/app/components/nav-user/nav-user.component.css
+new file mode 100644
+index 0000000..7c9ee96
+--- /dev/null
++++ b/src/app/components/nav-user/nav-user.component.css
+@@ -0,0 +1 @@
++/* TODO: stili di nav-user */
+diff --git a/src/app/components/nav-user/nav-user.component.html b/src/app/components/nav-user/nav-user.component.html
+new file mode 100644
+index 0000000..666b224
+--- /dev/null
++++ b/src/app/components/nav-user/nav-user.component.html
+@@ -0,0 +1,6 @@
++<div>
++    <!-- TODO: icona profilo del mockup -->
++    <span>{{ user().firstName }} {{ user().lastName }}</span>
++    <span>{{ ruolo() }}</span>
++    <button type="button" aria-label="Esci" (click)="logout()">Esci</button>
++</div>
+diff --git a/src/app/components/nav-user/nav-user.component.ts b/src/app/components/nav-user/nav-user.component.ts
+new file mode 100644
+index 0000000..b3b1927
+--- /dev/null
++++ b/src/app/components/nav-user/nav-user.component.ts
+@@ -0,0 +1,22 @@
++import { Component, computed, input, output } from '@angular/core';
++import { User } from '../../services/auth.service';
++import { USER_ROLE_LABELS } from '../../entities';
++
++// Parte della navbar che mostra l'utente loggato e il pulsante di uscita
++@Component({
++    selector: 'app-nav-user',
++    templateUrl: './nav-user.component.html',
++    // styleUrl: './nav-user.component.css',  // lo aggiungi quando farai il css
++})
++export class NavUserComponent {
++    user = input.required<User>();
++
++    logoutEvent = output({ alias: 'logout' });
++
++    // "Cittadino" / "Ente comunale"
++    ruolo = computed(() => USER_ROLE_LABELS[this.user().role]);
++
++    logout() {
++        this.logoutEvent.emit();
++    }
++}
+diff --git a/src/app/components/navbar/navbar.component.html b/src/app/components/navbar/navbar.component.html
+index e69de29..290ad8a 100644
+--- a/src/app/components/navbar/navbar.component.html
++++ b/src/app/components/navbar/navbar.component.html
+@@ -0,0 +1,23 @@
++<nav aria-label="Navigazione principale">
++    <!-- da loggato il logo porta al feed, altrimenti al login -->
++    <a [routerLink]="currentUser() ? '/feed' : '/login'">TechWarrior</a>
++    <span>{{ citta }}</span>
++
++    <!-- link alle pagine: solo da loggato -->
++    <ul *ifAuthenticated>
++        <li><a routerLink="/feed" routerLinkActive="active">Feed</a></li>
++        <li><a routerLink="/mappa" routerLinkActive="active">Mappa</a></li>
++        <li><a routerLink="/inviti" routerLinkActive="active">Inviti volontari</a></li>
++        <!-- solo il cittadino può inviare segnalazioni (al back un ente riceverebbe 403) -->
++        <li *ifRole="'cittadino'"><a routerLink="/segnalazione" routerLinkActive="active">Nuova segnalazione</a></li>
++    </ul>
++
++    <app-nav-user *ifAuthenticated="true; else notLogged" [user]="currentUser()!" (logout)="logout()" />
++
++    <ng-template #notLogged>
++        @if (showAuthBtns()) {
++        <a routerLink="/login">Accedi</a>
++        <a routerLink="/register">Registrati</a>
++        }
++    </ng-template>
++</nav>
+diff --git a/src/app/components/navbar/navbar.component.ts b/src/app/components/navbar/navbar.component.ts
+index e69de29..559f3e6 100644
+--- a/src/app/components/navbar/navbar.component.ts
++++ b/src/app/components/navbar/navbar.component.ts
+@@ -0,0 +1,49 @@
++import { Component, computed, inject } from '@angular/core';
++import { toSignal } from '@angular/core/rxjs-interop';
++import { filter, map } from 'rxjs';
++import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
++import { AuthService } from '../../services/auth.service';
++import { NavUserComponent } from '../nav-user/nav-user.component';
++import { IfAuthenticatedDirective } from '../../utils/if-authenticated.directive';
++import { IfRoleDirective } from '../../utils/if-role.directive';
++
++@Component({
++    selector: 'app-navbar',
++    imports: [
++        RouterLink,
++        RouterLinkActive,
++        NavUserComponent,
++        IfAuthenticatedDirective,
++        IfRoleDirective,
++    ],
++    templateUrl: './navbar.component.html',
++    // styleUrl: './navbar.component.css',  // lo aggiungi quando farai il css
++})
++export class NavbarComponent {
++    private authSrv = inject(AuthService);
++    private router = inject(Router);
++
++    currentUser = this.authSrv.currentUser;
++
++    // Dal mockup del feed la città compare nell'header. Per ora è fissa
++    protected readonly citta = 'Vicenza';
++
++    // url corrente senza query string (es. /login?dest=/feed -> /login)
++    private currentPath = toSignal(
++        this.router.events.pipe(
++            filter(event => event instanceof NavigationEnd),
++            map(event => event.urlAfterRedirects.split('?')[0])
++        ),
++        { initialValue: this.router.url.split('?')[0] }
++    );
++
++    // nelle pagine di login e registrazione i pulsanti Accedi/Registrati in navbar sono superflui
++    showAuthBtns = computed(() => !['/login', '/register'].includes(this.currentPath()));
++
++    logout() {
++        this.authSrv.logout();
++        // vado direttamente al login: restare sulla pagina corrente non rieseguirebbe la guard
++        // (Angular riusa la rotta) e la pagina resterebbe visibile
++        this.router.navigate(['/login']);
++    }
++}
+diff --git a/src/app/services/jwt.service.ts b/src/app/services/jwt.service.ts
+index eb1c57c..39e563b 100644
+--- a/src/app/services/jwt.service.ts
++++ b/src/app/services/jwt.service.ts
+@@ -4,20 +4,32 @@ import { Injectable } from '@angular/core';
+     providedIn: 'root',
+ })
+ export class JwtService {
+-    setToken(token: string) {
+-        localStorage.setItem('authToken', token);
++    // access token: l'interceptor lo manda in ogni richiesta.
++    // refresh token: serve solo a chiedere al back un nuovo access token quando scade.
++    private readonly ACCESS_KEY = 'authToken';
++    private readonly REFRESH_KEY = 'refreshToken';
++
++    setTokens(accessToken: string, refreshToken: string) {
++        localStorage.setItem(this.ACCESS_KEY, accessToken);
++        localStorage.setItem(this.REFRESH_KEY, refreshToken);
+     }
+ 
+     getToken(): string | null {
+-        return localStorage.getItem('authToken');
++        return localStorage.getItem(this.ACCESS_KEY);
++    }
++
++    getRefreshToken(): string | null {
++        return localStorage.getItem(this.REFRESH_KEY);
+     }
+ 
+     hasToken(): boolean {
+         return !!this.getToken();
+     }
+ 
++    // Chiude la sessione nel browser: toglie entrambi i token
+     removeToken() {
+-        localStorage.removeItem('authToken');
++        localStorage.removeItem(this.ACCESS_KEY);
++        localStorage.removeItem(this.REFRESH_KEY);
+     }
+ 
+-}
+\ No newline at end of file
++}
+diff --git a/src/app/services/segnalazione.service.ts b/src/app/services/segnalazione.service.ts
+index 271a7d2..68e831b 100644
+--- a/src/app/services/segnalazione.service.ts
++++ b/src/app/services/segnalazione.service.ts
+@@ -6,11 +6,11 @@ import { Proposta, Segnalazione } from '../entities';
+ 
+ // autoreId non si manda: il back lo ricava dal token JWT (come createdBy in EsameJavaScript).
+ // "foto" è il File originale scelto dall'utente (PNG, JPEG...), senza nessuna conversione.
++// Latitudine e longitudine non si mandano: le ricava il back dall'indirizzo (geocodifica).
+ export type CreateSegnalazionePayload = {
+     titolo: string,
+-    descrizione?: string,
+-    latitudine: number,
+-    longitudine: number,
++    descrizione: string,
++    indirizzo: string,
+     foto: File
+ };
+ 
+@@ -37,19 +37,16 @@ export class SegnalazioneService {
+     findPerMappa(): Observable<SegnalazioneMappa[]> {
+         return this.http.get<SegnalazioneMappa[]>('/api/segnalazioni/mappa');
+     }
++
+     // CONTRATTO CON IL BACK (da concordare col team): multipart/form-data con i campi
+-    // titolo, descrizione?, latitudine, longitudine, foto (file).
+-    // Il back valida il file, lo converte/salva e scrive l'url in segnalazione_immagini.
++    // titolo, descrizione, indirizzo, foto (file).
++    // Il back ricava latitudine/longitudine dall'indirizzo, valida il file, lo salva e scrive l'url in segnalazione_immagini.
+     // Non impostare Content-Type a mano: il browser aggiunge il boundary da solo.
+     create(payload: CreateSegnalazionePayload) {
+         const body = new FormData();
+         body.append('titolo', payload.titolo);
+-        if (payload.descrizione) {
+-            body.append('descrizione', payload.descrizione);
+-        }
+-        // FormData manda solo stringhe: il back le riconverte in numeri
+-        body.append('latitudine', String(payload.latitudine));
+-        body.append('longitudine', String(payload.longitudine));
++        body.append('descrizione', payload.descrizione);
++        body.append('indirizzo', payload.indirizzo);
+         body.append('foto', payload.foto, payload.foto.name);
+ 
+         return this.http.post<Segnalazione>(this.baseUrl, body);
+diff --git a/src/app/utils/if-authenticated.directive.ts b/src/app/utils/if-authenticated.directive.ts
+new file mode 100644
+index 0000000..388ca74
+--- /dev/null
++++ b/src/app/utils/if-authenticated.directive.ts
+@@ -0,0 +1,43 @@
++import { Directive, effect, inject, input, TemplateRef, ViewContainerRef } from '@angular/core';
++import { AuthService } from '../services/auth.service';
++
++@Directive({
++  selector: '[ifAuthenticated]'
++})
++export class IfAuthenticatedDirective {
++  private authSrv = inject(AuthService);
++  private templateRef = inject(TemplateRef<unknown>);
++  private viewContainer = inject(ViewContainerRef);
++
++  // stato di login per cui mostrare il template: *ifAuthenticated="false" inverte la condizione.
++  // *ifAuthenticated senza valore bind la stringa vuota, che qui vale true
++  expected = input(true, {
++    alias: 'ifAuthenticated',
++    transform: (value: boolean | '') => value === '' || value,
++  });
++
++  // *ifAuthenticated="true; else notLogged" -> binding su ifAuthenticatedElse
++  elseTemplate = input<TemplateRef<unknown> | null>(null, { alias: 'ifAuthenticatedElse' });
++
++  // tengo traccia di cosa sto mostrando per non ricreare la view inutilmente
++  private currentTemplate: TemplateRef<unknown> | null = null;
++
++  constructor() {
++    effect(() => {
++      // mostro e nascondo ogni volta che isAuthenticated cambia
++      const matches = this.authSrv.isAuthenticated() === this.expected();
++      this.updateView(matches ? this.templateRef : this.elseTemplate());
++    });
++  }
++
++  private updateView(template: TemplateRef<unknown> | null) {
++    if (template === this.currentTemplate) return;
++
++    this.viewContainer.clear();
++    this.currentTemplate = template;
++
++    if (template) {
++      this.viewContainer.createEmbeddedView(template);
++    }
++  }
++}
+

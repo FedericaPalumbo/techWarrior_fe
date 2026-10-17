@@ -1,0 +1,23 @@
+<nav aria-label="Navigazione principale">
+    <!-- da loggato il logo porta al feed, altrimenti al login -->
+    <a [routerLink]="currentUser() ? '/feed' : '/login'">TechWarrior</a>
+    <span>{{ citta }}</span>
+
+    <!-- link alle pagine: solo da loggato -->
+    <ul *ifAuthenticated>
+        <li><a routerLink="/feed" routerLinkActive="active">Feed</a></li>
+        <li><a routerLink="/mappa" routerLinkActive="active">Mappa</a></li>
+        <li><a routerLink="/inviti" routerLinkActive="active">Inviti volontari</a></li>
+        <!-- solo il cittadino può inviare segnalazioni (al back un ente riceverebbe 403) -->
+        <li *ifRole="'cittadino'"><a routerLink="/segnalazione" routerLinkActive="active">Nuova segnalazione</a></li>
+    </ul>
+
+    <app-nav-user *ifAuthenticated="true; else notLogged" [user]="currentUser()!" (logout)="logout()" />
+
+    <ng-template #notLogged>
+        @if (showAuthBtns()) {
+        <a routerLink="/login">Accedi</a>
+        <a routerLink="/register">Registrati</a>
+        }
+    </ng-template>
+</nav>
