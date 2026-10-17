@@ -1,49 +1,140 @@
+/* Pagina "Mappa". Stessa grafica della pagina segnalazione: sfondo lavanda, barra bianca, mappa in una card arrotondata.
+   Colori e font arrivano da src/styles.css (--myc-viola, --myc-viola-scuro, --myc-lavanda, --myc-testo). */
+
+/* Altezza = schermo meno la navbar (72px, come nella pagina segnalazione) */
 :host {
     display: block;
+    height: calc(100dvh - 72px);
+    min-height: 520px;
+    padding: 20px 24px 24px;
+    box-sizing: border-box;
+    background: linear-gradient(180deg, #a3a1cc 0%, var(--myc-lavanda) 100%);
 }
 
-/* Altezza = schermo meno la navbar: adatta il 4rem alla tua navbar */
 .pagina-mappa {
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 4rem);
-    padding: 12px;
-    box-sizing: border-box;
+    height: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.intestazione {
+/* ---------- Seleziona la zona: titolo + barra, in alto al centro ---------- */
+
+.zona {
+    flex: none;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto 16px;
+}
+
+.titolo-pagina {
+    margin: 0 0 12px;
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Barra di ricerca bianca con lente a destra */
+.ricerca {
     display: flex;
-    align-items: baseline;
-    gap: 12px;
-    margin-bottom: 8px;
+    align-items: center;
+    padding: 0 8px 0 18px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(60, 40, 110, 0.18);
 }
 
-.intestazione h1 {
-    margin: 0;
-    font-size: 1.3rem;
+.ricerca:focus-within {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6), 0 4px 14px rgba(60, 40, 110, 0.18);
+}
+
+.ricerca input {
+    flex: 1;
+    min-width: 0;
+    height: 52px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--myc-testo);
+    font: inherit;
+    font-size: 1rem;
+}
+
+.ricerca-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--myc-testo);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.ricerca-btn:hover:not(:disabled) {
+    background: #f1edf8;
+    color: var(--myc-viola);
+}
+
+.ricerca-btn:disabled {
+    opacity: 0.5;
+    cursor: progress;
+}
+
+.ricerca-btn:focus-visible {
+    outline: 3px solid var(--myc-viola);
+    outline-offset: 1px;
+}
+
+/* Avvisi sotto la barra (indirizzo non trovato, fuori comune) */
+.messaggio-zona {
+    margin: 10px 0 0;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: #fef3c7;
+    color: #78350f;
+    font-size: 0.85rem;
 }
 
 .stato {
-    margin: 0;
+    margin: 8px 0 0;
+    color: #fff;
     font-size: 0.85rem;
-    color: #6b7280;
+    text-align: center;
 }
+
+/* ---------- Mappa ---------- */
 
 .contenitore-mappa {
+    position: relative;
     flex: 1;
     min-height: 0;
-    border-radius: 10px;
+    /* isolation: i z-index interni di Leaflet non finiscono sopra la navbar o il modale */
+    isolation: isolate;
+    border-radius: 24px;
     overflow: hidden;
+    box-shadow: 0 8px 24px rgba(60, 40, 110, 0.3);
 }
 
+/* ---------- Messaggi di esito ---------- */
+
 .messaggio {
+    flex: none;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 8px;
-    padding: 8px 12px;
-    border-radius: 8px;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto 12px;
+    padding: 10px 16px;
+    box-sizing: border-box;
+    border-radius: 12px;
     font-size: 0.9rem;
 }
 
@@ -57,11 +148,48 @@
     color: #78350f;
 }
 
+.messaggio-ok {
+    background: #dcfce7;
+    color: #14532d;
+}
+
+/* messaggio di una sola riga: testo centrato */
+.messaggio-esito {
+    justify-content: center;
+    text-align: center;
+}
+
 .messaggio button {
-    padding: 4px 12px;
+    padding: 4px 14px;
     border: 1px solid currentColor;
-    border-radius: 6px;
+    border-radius: 999px;
     background: transparent;
     color: inherit;
     cursor: pointer;
+}
+
+/* ---------- Responsive (telefono / tablet) ---------- */
+@media (max-width: 900px) {
+    :host {
+        padding: 14px 12px 16px;
+    }
+
+    .titolo-pagina {
+        margin-bottom: 10px;
+        font-size: 1.25rem;
+    }
+
+    .zona {
+        margin-bottom: 12px;
+    }
+
+    .ricerca input {
+        height: 48px;
+        /* 16px: sotto questa soglia iPhone/Safari ingrandisce la pagina quando si tocca il campo */
+        font-size: 16px;
+    }
+
+    .contenitore-mappa {
+        border-radius: 20px;
+    }
 }

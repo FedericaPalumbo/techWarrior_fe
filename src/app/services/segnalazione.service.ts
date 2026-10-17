@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SegnalazioneMappa } from '../entities';
 import { Proposta, Segnalazione } from '../entities';
+import { BehaviorSubject, catchError, map, of, switchMap, tap } from 'rxjs';
 
 // autoreId non si manda: il back lo ricava dal token JWT (come createdBy in EsameJavaScript).
 // "foto" è il File originale scelto dall'utente (PNG, JPEG...), senza nessuna conversione.
@@ -34,9 +35,29 @@ export class SegnalazioneService {
         return this.http.get<Segnalazione[]>(this.baseUrl);
     }
 
-    // Lista leggera per la mappa (solo id, titolo, stato, coordinate)
+    // Lista per la mappa (id, titolo, stato, coordinate, voti).
+    // Usa lo stesso endpoint del feed (GET /api/segnalazioni, che funziona già) e tiene solo le segnalazioni
+    // con coordinate: un endpoint dedicato /api/segnalazioni/mappa potrà sostituirlo quando il back lo avrà.
     findPerMappa(): Observable<SegnalazioneMappa[]> {
-        return this.http.get<SegnalazioneMappa[]>('/api/segnalazioni/mappa');
+        return this.find().pipe(
+            // come nel feed: la risposta può essere l'array diretto oppure { data: [...] }
+            map((res: unknown) => {
+                const lista = Array.isArray(res) ? res : ((res as { data?: unknown })?.data ?? []);
+                return lista as Segnalazione[];
+            }),
+            map(lista => lista.flatMap((s): SegnalazioneMappa[] =>
+                s.latitudine === null || s.longitudine === null
+                    ? []
+                    : [{
+                        id: s.id,
+                        titolo: s.titolo,
+                        stato: s.stato,
+                        latitudine: Number(s.latitudine),
+                        longitudine: Number(s.longitudine),
+                        voti: s.voti,
+                    }]
+            ))
+        );
     }
 
     // CONTRATTO CON IL BACK (da concordare col team): multipart/form-data con i campi

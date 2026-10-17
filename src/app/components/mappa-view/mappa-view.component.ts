@@ -3,6 +3,7 @@ import * as L from 'leaflet';
 import 'leaflet.markercluster';
 import { SegnalazioneMappa, StatoSegnalazione } from '../../entities';
 import { MAPPA_CONFIG, STATI_ORDINE, STATO_COLORE, STATO_LABEL } from '../../config/mappa.config';
+import { Coordinate } from '../../services/geocodifica.service';
 import { PosizioneCorrente } from '../../services/posizione.service';
 
 // Componente "dumb": non conosce servizi né API, riceve dati e restituisce eventi.
@@ -16,6 +17,8 @@ export class MappaViewComponent {
     segnalazioni = input<SegnalazioneMappa[]>([]);
     statiAttivi = input<StatoSegnalazione[]>([...STATI_ORDINE]);
     posizioneUtente = input<PosizioneCorrente | null>(null);
+    // Zona cercata nella barra "Seleziona la zona": la mappa si sposta li'
+    centraSu = input<Coordinate | null>(null);
 
     // --- Output ---
     segnalazioneSelezionata = output<SegnalazioneMappa>();
@@ -53,6 +56,14 @@ export class MappaViewComponent {
             const posizione = this.posizioneUtente();
             if (this.mappaPronta() && posizione) {
                 this.mostraPosizione(posizione);
+            }
+        });
+
+        // Sposta la mappa sulla zona cercata (il padre manda un nuovo oggetto a ogni ricerca)
+        effect(() => {
+            const zona = this.centraSu();
+            if (this.mappaPronta() && zona && this.map) {
+                this.map.flyTo([zona.latitudine, zona.longitudine], Math.max(this.map.getZoom(), 16));
             }
         });
 
@@ -113,7 +124,8 @@ export class MappaViewComponent {
                     icon: this.creaIcona(s.stato),
                     title: s.titolo,
                 });
-                marker.bindPopup(this.creaPopup(s));
+                // Il tocco sul pin apre il modale (lo gestisce la pagina), non un popup di Leaflet
+                marker.on('click', () => this.segnalazioneSelezionata.emit(s));
                 return marker;
             });
 
@@ -125,33 +137,10 @@ export class MappaViewComponent {
         const colore = STATO_COLORE[stato];
         return L.divIcon({
             className: 'pin-segnalazione',
-            html: `<span style="display:block;width:24px;height:24px;background:${colore};border:2px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 1px 4px rgba(0,0,0,.45)"></span>`,
-            iconSize: [24, 24],
-            iconAnchor: [12, 28],
-            popupAnchor: [0, -26],
+            html: `<span style="display:block;width:30px;height:30px;background:${colore};border:2px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 1px 4px rgba(0,0,0,.45)"></span>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 35],
         });
-    }
-
-    // Il popup è costruito con il DOM (textContent) perché il titolo è scritto dagli utenti
-    private creaPopup(s: SegnalazioneMappa): HTMLElement {
-        const box = document.createElement('div');
-
-        const titolo = document.createElement('strong');
-        titolo.textContent = s.titolo;
-
-        const stato = document.createElement('div');
-        stato.textContent = STATO_LABEL[s.stato];
-        stato.style.color = STATO_COLORE[s.stato];
-        stato.style.fontWeight = '600';
-        stato.style.margin = '4px 0 8px';
-
-        const bottone = document.createElement('button');
-        bottone.type = 'button';
-        bottone.textContent = 'Apri segnalazione';
-        bottone.addEventListener('click', () => this.segnalazioneSelezionata.emit(s));
-
-        box.append(titolo, stato, bottone);
-        return box;
     }
 
     private mostraPosizione(pos: PosizioneCorrente) {

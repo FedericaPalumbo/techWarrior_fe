@@ -53,7 +53,8 @@ export type SegnalazioneMappa = {
     titolo: string,
     stato: StatoSegnalazione,
     latitudine: number,
-    longitudine: number
+    longitudine: number,
+    voti?: number
 };
 
 // La "soluzione" proposta dall'utente (tabella proposte_segnalazione)

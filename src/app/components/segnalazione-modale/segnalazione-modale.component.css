@@ -1,0 +1,412 @@
+/* Modale della segnalazione sulla mappa.
+   Colori e font arrivano da src/styles.css (--myc-viola, --myc-viola-scuro, --myc-lavanda, --myc-testo).
+   Desktop: finestra centrata. Telefono: pannello che sale dal basso (bottom sheet). */
+
+:host {
+    display: contents;
+}
+
+/* z-index 2000: sopra alla navbar (1100) e ai controlli di Leaflet (1000) */
+.sfondo {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(43, 35, 64, 0.55);
+    animation: sfuma 0.2s ease;
+}
+
+.modale {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    /* se lo schermo è basso (telefono in orizzontale) il contenuto scorre dentro al modale */
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 28px 24px 24px;
+    box-sizing: border-box;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 16px 40px rgba(60, 40, 110, 0.35);
+    animation: sali 0.25s ease;
+}
+
+.modale:focus {
+    outline: 0;
+}
+
+/* ---------- Chiudi ---------- */
+
+.chiudi {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--myc-testo);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.chiudi svg,
+.rimuovi svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+}
+
+.chiudi:focus-visible,
+.rimuovi:focus-visible {
+    outline: 3px solid var(--myc-viola);
+    outline-offset: 1px;
+}
+
+/* ---------- Testata: stato + titolo ---------- */
+
+.testata {
+    /* spazio a destra per non finire sotto al pulsante Chiudi */
+    margin: 0 40px 18px 0;
+}
+
+.stato {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: #f1edf8;
+    color: var(--myc-viola-scuro);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* il pallino ha lo stesso colore del pin sulla mappa */
+.stato::before {
+    content: '';
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--colore-stato, var(--myc-viola));
+}
+
+.titolo {
+    margin: 0;
+    color: var(--myc-viola);
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.25;
+    /* i titoli li scrivono gli utenti: una parola lunghissima non deve rompere il layout */
+    overflow-wrap: anywhere;
+}
+
+/* ---------- Up vote / down vote ---------- */
+
+.voti {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 22px;
+    padding: 12px;
+    border-radius: 18px;
+    background: #f6f2fc;
+}
+
+.voti button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    border: 2px solid var(--myc-lavanda);
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.voti svg {
+    width: 26px;
+    height: 26px;
+    fill: var(--myc-viola);
+    transition: fill 0.2s;
+}
+
+.voti button.attivo {
+    border-color: var(--myc-viola);
+    background: var(--myc-viola);
+    transform: scale(1.08);
+}
+
+.voti button.attivo svg {
+    fill: #fff;
+}
+
+.voti button:focus-visible {
+    outline: 3px solid var(--myc-viola);
+    outline-offset: 2px;
+}
+
+.punteggio {
+    min-width: 56px;
+    color: var(--myc-viola-scuro);
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* ---------- Campi (stessi stili della pagina "segnalazione") ---------- */
+
+.campo {
+    margin-bottom: 18px;
+}
+
+.campo label,
+.etichetta {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--myc-viola-scuro);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.facoltativo {
+    color: #8a869c;
+    font-weight: 400;
+}
+
+.campo textarea {
+    display: block;
+    width: 100%;
+    padding: 10px 14px;
+    box-sizing: border-box;
+    border: 1px solid #d9d5e6;
+    border-radius: 12px;
+    background: #fff;
+    color: var(--myc-testo);
+    font: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.campo textarea::placeholder {
+    color: #a9a5ba;
+}
+
+.campo textarea:focus {
+    outline: 0;
+    border-color: var(--myc-viola);
+    box-shadow: 0 0 0 3px rgba(111, 66, 176, 0.18);
+}
+
+.errore-campo {
+    margin: 6px 0 0;
+    color: #c0392b;
+    font-size: 0.8rem;
+}
+
+/* ---------- Foto di conferma ---------- */
+
+/* input file nascosto ma raggiungibile da tastiera (la label fa da pulsante) */
+.foto-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.campo .foto-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    margin: 0;
+    padding: 12px;
+    box-sizing: border-box;
+    border: 2px dashed var(--myc-lavanda);
+    border-radius: 14px;
+    color: var(--myc-viola);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.campo .foto-area:hover {
+    border-color: var(--myc-viola);
+    background: #f6f2fc;
+}
+
+.foto-input:focus-visible+.foto-area {
+    border-color: var(--myc-viola);
+    box-shadow: 0 0 0 3px rgba(111, 66, 176, 0.25);
+}
+
+.anteprime {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.anteprime li {
+    position: relative;
+}
+
+.anteprime img {
+    display: block;
+    width: 84px;
+    height: 84px;
+    border-radius: 14px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(60, 40, 110, 0.25);
+}
+
+/* la X sporge dall'angolo; 44px di area toccabile intorno a un cerchio visibile di 26px */
+.rimuovi {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.rimuovi svg {
+    box-sizing: content-box;
+    width: 14px;
+    height: 14px;
+    padding: 6px;
+    border-radius: 50%;
+    background: var(--myc-viola);
+    color: #fff;
+    stroke-width: 3;
+}
+
+/* ---------- Invia ---------- */
+
+.btn-invia {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    padding: 13px 24px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--myc-viola);
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.btn-invia:hover:not(:disabled) {
+    background: var(--myc-viola-scuro);
+    transform: translateY(-1px);
+}
+
+.btn-invia:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-invia:focus-visible {
+    outline: 3px solid rgba(111, 66, 176, 0.4);
+    outline-offset: 2px;
+}
+
+/* Gli effetti hover solo con il mouse: su touch resterebbero "appiccicati" dopo il tap */
+@media (hover: hover) {
+    .chiudi:hover {
+        background: #f1edf8;
+        color: var(--myc-viola);
+    }
+
+    .voti button:not(.attivo):hover {
+        border-color: var(--myc-viola);
+        background: #f1edf8;
+    }
+}
+
+/* ---------- Animazioni (solo in risposta al tocco sul pin) ---------- */
+
+@keyframes sfuma {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes sali {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .sfondo,
+    .modale {
+        animation: none;
+    }
+
+    .btn-invia,
+    .voti button {
+        transition: none;
+    }
+}
+
+/* ---------- Responsive (telefono): pannello dal basso ---------- */
+@media (max-width: 575.98px) {
+    .sfondo {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .modale {
+        max-width: none;
+        max-height: 92dvh;
+        padding: 24px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+        border-radius: 24px 24px 0 0;
+    }
+
+    .titolo {
+        font-size: 1.25rem;
+    }
+
+    /* 16px: sotto questa soglia iPhone/Safari ingrandisce la pagina quando si tocca il campo */
+    .campo textarea {
+        font-size: 16px;
+    }
+
+    .anteprime img {
+        width: 76px;
+        height: 76px;
+    }
+}
