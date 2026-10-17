@@ -20,7 +20,7 @@
     <div>
         @for (iniziativa of iniziative; track iniziativa.id) {
         <app-iniziativa-card [iniziativa]="iniziativa" [mostraPartecipa]="authSrv.isCittadino()"
-            (onPartecipa)="partecipa(iniziativa.id)" (onAnnullaPartecipa)="annullaPartecipazione(iniziativa.id)" />
+            (onPartecipa)="partecipa(iniziativa.id)" />
         } @empty {
         @if (!errorMessage()) {
         <p class="stato">Nessun invito per ora.</p>

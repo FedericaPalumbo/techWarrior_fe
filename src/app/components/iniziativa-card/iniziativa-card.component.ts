@@ -13,7 +13,6 @@ export class IniziativaCardComponent {
     mostraPartecipa = input(true);
 
     onPartecipa = output<void>();
-    onAnnullaPartecipa = output<void>();
 
     // immagineUrl è facoltativa nel DB
     immagine = computed(() => this.iniziativa().immagineUrl);
@@ -43,10 +42,9 @@ export class IniziativaCardComponent {
         return [periodo, luogo].filter(Boolean).join(', ');
     });
 
+    // l'annullamento non è ancora implementato nel back: se è già iscritto non succede nulla
     partecipa() {
-        if (this.iniziativa().partecipo) {
-            this.onAnnullaPartecipa.emit();
-        } else {
+        if (!this.iniziativa().partecipo) {
             this.onPartecipa.emit();
         }
     }

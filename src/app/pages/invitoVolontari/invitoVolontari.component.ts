@@ -72,20 +72,6 @@ export class InvitoVolontariComponent {
             });
     }
 
-    annullaPartecipazione(id: number) {
-        this.errorMessage.set(null);
-        this.iniziativaSrv.annullaPartecipazione(id)
-            .pipe(
-                catchError(response => {
-                    this.mostraErrore(response);
-                    return EMPTY;
-                })
-            )
-            .subscribe(() => {
-                this.reload$.next();
-            });
-    }
-
     // se manca il messaggio del BE (ad esempio server spento, status 0) uso un testo generico
     private mostraErrore(response: { error?: { message?: string } }) {
         this.errorMessage.set(response.error?.message ?? 'Si è verificato un errore, riprova più tardi');

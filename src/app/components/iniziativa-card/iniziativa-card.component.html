@@ -26,8 +26,10 @@
             }
 
             @if (mostraPartecipa()) {
-            <button type="button" class="btn-partecipa" [class.attivo]="iniziativa().partecipo" (click)="partecipa()">
-                {{ iniziativa().partecipo ? 'Annulla partecipazione' : 'Mi offro come volontario' }}
+            <!-- già iscritto: il pulsante resta solo come scritta, non è più cliccabile -->
+            <button type="button" class="btn-partecipa" [class.attivo]="iniziativa().partecipo"
+                [disabled]="iniziativa().partecipo" (click)="partecipa()">
+                {{ iniziativa().partecipo ? 'Sei iscritto!' : 'Mi offro come volontario' }}
             </button>
             }
         </div>

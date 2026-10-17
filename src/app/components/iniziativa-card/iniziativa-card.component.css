@@ -118,14 +118,19 @@
     transform: translateY(-2px);
 }
 
-/* già volontario: pulsante "vuoto", per annullare */
-.btn-partecipa.attivo {
+/* già iscritto: pulsante "vuoto" con la scritta "Sei iscritto!", non cliccabile */
+.btn-partecipa.attivo,
+.btn-partecipa:disabled {
     background: transparent;
     color: #fff;
+    border-color: #fff;
+    cursor: default;
 }
 
-.btn-partecipa.attivo:hover {
-    background: rgba(255, 255, 255, 0.15);
+.btn-partecipa.attivo:hover,
+.btn-partecipa:disabled:hover {
+    background: transparent;
+    transform: none;
 }
 
 .btn-partecipa:focus-visible {
