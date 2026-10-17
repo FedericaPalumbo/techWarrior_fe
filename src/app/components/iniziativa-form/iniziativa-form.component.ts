@@ -29,16 +29,17 @@ export class IniziativaFormComponent {
     protected fb = inject(FormBuilder);
     activeModal = inject(NgbActiveModal);
 
-    // Controlli solo per l'utente (UX): la validazione vera (formato reale, peso) spetta al back
-    private readonly MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+    // Controlli solo per l'utente (UX): la validazione vera (formato reale, peso) spetta al back,
+    // che accetta file fino a 5 MB
+    private readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
     protected readonly TIPI_ACCETTATI = ['image/png', 'image/jpeg', 'image/webp'];
 
-    // titolo e descrizione sono NOT NULL nel DB; date, luogo e immagine sono facoltativi.
+    // Il backend vuole titolo (3-150 caratteri) e descrizione (1-2000); date, luogo (max 255) e immagine sono facoltativi.
     // Gli <input type="datetime-local"> danno stringhe tipo "2026-10-20T18:00"
     iniziativaForm = this.fb.nonNullable.group({
-        titolo: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
-        descrizione: ['', [Validators.required, Validators.pattern(/\S/)]],
-        luogo: [''],
+        titolo: ['', [Validators.required, Validators.pattern(/\S/), Validators.minLength(3), Validators.maxLength(100)]],
+        descrizione: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(2000)]],
+        luogo: ['', [Validators.maxLength(255)]],
         dataInizio: [''],
         dataFine: [''],
     }, { validators: dateValidator });
@@ -63,7 +64,7 @@ export class IniziativaFormComponent {
         }
         if (file.size > this.MAX_FILE_SIZE) {
             this.immagine.set(null);
-            this.immagineErrore.set('L\'immagine è troppo pesante (massimo 10 MB).');
+            this.immagineErrore.set('L\'immagine è troppo pesante (massimo 5 MB).');
             input.value = '';
             return;
         }

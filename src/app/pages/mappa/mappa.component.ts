@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, of, switchMap, tap } from 'rxjs';
-import { SegnalazioneMappa, StatoSegnalazione } from '../../entities/entities';
+import { SegnalazioneMappa, StatoSegnalazione } from '../../entities';
 import { MappaViewComponent } from '../../components/mappa-view/mappa-view.component';
 import { MAPPA_CONFIG, STATI_ORDINE } from '../../config/mappa.config';
 import { MOCK_SEGNALAZIONI_MAPPA } from '../../config/mappa.mock';

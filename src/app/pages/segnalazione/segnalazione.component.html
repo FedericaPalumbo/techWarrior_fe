@@ -9,16 +9,16 @@
 
 <form [formGroup]="form" (ngSubmit)="invia()" novalidate>
 
-    <!-- TITOLO (obbligatorio) -->
+    <!-- TITOLO (obbligatorio, almeno 3 caratteri) -->
     <div>
         <label for="titolo">Titolo *</label>
         <input id="titolo" type="text" formControlName="titolo" maxlength="100" />
-        @if (form.controls.titolo.touched && form.controls.titolo.errors?.['required']) {
-        <p>Il titolo è obbligatorio.</p>
+        @if (form.controls.titolo.touched && form.controls.titolo.invalid) {
+        <p>Il titolo è obbligatorio (almeno 3 caratteri).</p>
         }
     </div>
 
-    <!-- FOTO (obbligatoria). Il file va al back così com'è (PNG, JPEG...): formato e salvataggio li gestisce lui -->
+    <!-- FOTO (obbligatoria). Il file va al back così com'è (PNG, JPEG, WEBP, max 5 MB): salvataggio lo gestisce lui -->
     <div>
         <label for="foto">Foto del problema *</label>
         <input #fileInput id="foto" type="file" accept="image/png,image/jpeg,image/webp"
@@ -36,23 +36,23 @@
         }
     </div>
 
-    <!-- POSIZIONE (rilevata in automatico, serve per latitudine/longitudine) -->
+    <!-- INDIRIZZO (obbligatorio): il back lo trasforma in latitudine/longitudine per la mappa -->
     <div>
-        <p>Posizione</p>
-        @if (posizione(); as pos) {
-        <p>Posizione rilevata ({{ pos.latitudine.toFixed(5) }}, {{ pos.longitudine.toFixed(5) }})</p>
-        } @else if (posizioneErrore()) {
-        <p>{{ posizioneErrore() }}</p>
-        <button type="button" (click)="richiediPosizione()">Riprova</button>
-        } @else {
-        <p>Rilevamento della posizione in corso...</p>
+        <label for="indirizzo">Indirizzo *</label>
+        <input id="indirizzo" type="text" formControlName="indirizzo" maxlength="255"
+            placeholder="es. Via Roma 10, Vicenza" />
+        @if (form.controls.indirizzo.touched && form.controls.indirizzo.invalid) {
+        <p>L'indirizzo è obbligatorio (meglio se con il comune).</p>
         }
     </div>
 
-    <!-- DESCRIZIONE (facoltativa) -->
+    <!-- DESCRIZIONE (obbligatoria) -->
     <div>
-        <label for="descrizione">Descrizione (facoltativa)</label>
-        <textarea id="descrizione" formControlName="descrizione" rows="4"></textarea>
+        <label for="descrizione">Descrizione *</label>
+        <textarea id="descrizione" formControlName="descrizione" rows="4" maxlength="2000"></textarea>
+        @if (form.controls.descrizione.touched && form.controls.descrizione.invalid) {
+        <p>La descrizione è obbligatoria.</p>
+        }
     </div>
 
     <!-- SOLUZIONE (facoltativa) -> proposte_segnalazione -->
@@ -65,7 +65,7 @@
     <p>{{ errore() }}</p>
     }
 
-    <button type="submit" [disabled]="inviando() || !posizione()">
+    <button type="submit" [disabled]="inviando()">
         @if (inviando()) { Invio in corso... } @else { Invia segnalazione }
     </button>
 </form>

@@ -1,7 +1,7 @@
 import { Component, DestroyRef, ElementRef, computed, effect, inject, input, output, signal, viewChild } from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
-import { SegnalazioneMappa, StatoSegnalazione } from '../../entities/entities';
+import { SegnalazioneMappa, StatoSegnalazione } from '../../entities';
 import { MAPPA_CONFIG, STATI_ORDINE, STATO_COLORE, STATO_LABEL } from '../../config/mappa.config';
 import { PosizioneCorrente } from '../../services/posizione.service';
 

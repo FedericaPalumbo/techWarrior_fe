@@ -1,12 +1,13 @@
-import { Component, DestroyRef, ElementRef, OnInit, inject, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { catchError, of, switchMap } from 'rxjs';
 import { SegnalazioneService } from '../../services/segnalazione.service';
 
-interface Posizione {
-    latitudine: number;
-    longitudine: number;
+// Il testo viene inviato senza spazi ai lati, quindi la lunghezza minima la controllo sul testo ripulito
+function testoMinimo(min: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null =>
+        String(control.value ?? '').trim().length >= min ? null : { testoMinimo: { min } };
 }
 
 @Component({
@@ -15,7 +16,7 @@ interface Posizione {
     templateUrl: './segnalazione.component.html',
     // styleUrl: './segnalazione.component.css',  // lo aggiungi quando farai il css
 })
-export class SegnalazioneComponent implements OnInit {
+export class SegnalazioneComponent {
     private fb = inject(FormBuilder);
     private segnalazioneSrv = inject(SegnalazioneService);
     private destroyRef = inject(DestroyRef);
@@ -23,14 +24,17 @@ export class SegnalazioneComponent implements OnInit {
     // Riferimento all'<input type="file" #fileInput> del template
     private fotoInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
 
-    // Controlli solo per l'utente (UX): la validazione vera (formato reale, peso) spetta al back
-    private readonly MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+    // Controlli solo per l'utente (UX): la validazione vera (formato reale, peso) spetta al back,
+    // che accetta file fino a 5 MB
+    private readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
     protected readonly TIPI_ACCETTATI = ['image/png', 'image/jpeg', 'image/webp'];
 
-    // Campi di testo. "descrizione" e "soluzione" sono facoltativi.
+    // Il backend vuole titolo (3-150 caratteri), descrizione (1-2000) e indirizzo: sono tutti obbligatori.
+    // "soluzione" è facoltativa e diventa una proposta collegata alla segnalazione.
     form = this.fb.nonNullable.group({
-        titolo: ['', [Validators.required, Validators.maxLength(100)]],
-        descrizione: [''],
+        titolo: ['', [testoMinimo(3), Validators.maxLength(100)]],
+        indirizzo: ['', [testoMinimo(1), Validators.maxLength(255)]],
+        descrizione: ['', [testoMinimo(1), Validators.maxLength(2000)]],
         soluzione: [''],
     });
 
@@ -38,8 +42,6 @@ export class SegnalazioneComponent implements OnInit {
     foto = signal<File | null>(null); // il file originale: è quello che manda il service
     anteprima = signal<string | null>(null); // blob: URL solo per mostrare la foto nella pagina
     fotoErrore = signal<string | null>(null);
-    posizione = signal<Posizione | null>(null);
-    posizioneErrore = signal<string | null>(null);
     tentativoInvio = signal(false);
     inviando = signal(false);
     inviata = signal(false);
@@ -49,35 +51,6 @@ export class SegnalazioneComponent implements OnInit {
     constructor() {
         // l'URL dell'anteprima occupa memoria finché non lo rilascio
         this.destroyRef.onDestroy(() => this.rilasciaAnteprima());
-    }
-
-    ngOnInit() {
-        // latitudine e longitudine sono NOT NULL nel DB: le chiedo subito al dispositivo
-        this.richiediPosizione();
-    }
-
-    richiediPosizione() {
-        this.posizioneErrore.set(null);
-
-        if (!navigator.geolocation) {
-            this.posizioneErrore.set('Il tuo dispositivo non supporta la geolocalizzazione.');
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            pos => {
-                this.posizione.set({
-                    latitudine: pos.coords.latitude,
-                    longitudine: pos.coords.longitude,
-                });
-            },
-            () => {
-                this.posizioneErrore.set(
-                    'Non riesco a ottenere la posizione. Controlla i permessi di localizzazione e riprova.'
-                );
-            },
-            { enableHighAccuracy: true, timeout: 10000 }
-        );
     }
 
     onFotoSelezionata(event: Event) {
@@ -95,7 +68,7 @@ export class SegnalazioneComponent implements OnInit {
             return;
         }
         if (file.size > this.MAX_FILE_SIZE) {
-            this.fotoErrore.set('L\'immagine è troppo grande (massimo 10 MB).');
+            this.fotoErrore.set('L\'immagine è troppo grande (massimo 5 MB).');
             input.value = '';
             return;
         }
@@ -115,24 +88,23 @@ export class SegnalazioneComponent implements OnInit {
         this.form.markAllAsTouched();
 
         const foto = this.foto();
-        const posizione = this.posizione();
-        if (this.form.invalid || !foto || !posizione) {
+        if (this.form.invalid || !foto) {
             return;
         }
 
-        const { titolo, descrizione, soluzione } = this.form.getRawValue();
+        const { titolo, indirizzo, descrizione, soluzione } = this.form.getRawValue();
         const soluzioneTrim = soluzione.trim();
 
         this.inviando.set(true);
+        this.inviata.set(false);
         this.errore.set(null);
         this.avviso.set(null);
 
         this.segnalazioneSrv
             .create({
                 titolo: titolo.trim(),
-                descrizione: descrizione.trim() || undefined,
-                latitudine: posizione.latitudine,
-                longitudine: posizione.longitudine,
+                descrizione: descrizione.trim(),
+                indirizzo: indirizzo.trim(),
                 foto,
             })
             .pipe(
@@ -161,11 +133,23 @@ export class SegnalazioneComponent implements OnInit {
                     this.inviata.set(true);
                     this.resetForm();
                 },
-                error: () => {
+                error: response => {
                     this.inviando.set(false);
-                    this.errore.set('Invio non riuscito. Riprova tra qualche istante.');
+                    this.errore.set(this.messaggioErrore(response));
                 },
             });
+    }
+
+    // Il back risponde con messaggi utili (es. "Indirizzo non trovato", "Servizio di geocodifica non raggiungibile")
+    private messaggioErrore(response: { status?: number, error?: { message?: string } }): string {
+        if (response.status === 403) {
+            return 'Solo i cittadini possono inviare segnalazioni.';
+        }
+        const messaggio = response.error?.message;
+        if (messaggio && messaggio !== 'Validation failed') {
+            return messaggio;
+        }
+        return 'Invio non riuscito. Controlla i dati e riprova tra qualche istante.';
     }
 
     private svuotaInputFoto() {

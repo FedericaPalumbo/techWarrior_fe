@@ -1,5 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { SegnalazioneMappa } from '../entities';
 import { Proposta, Segnalazione } from '../entities';
 
 // autoreId non si manda: il back lo ricava dal token JWT (come createdBy in EsameJavaScript).
@@ -31,6 +33,10 @@ export class SegnalazioneService {
         return this.http.get<Segnalazione[]>(this.baseUrl);
     }
 
+    // Lista leggera per la mappa (solo id, titolo, stato, coordinate)
+    findPerMappa(): Observable<SegnalazioneMappa[]> {
+        return this.http.get<SegnalazioneMappa[]>('/api/segnalazioni/mappa');
+    }
     // CONTRATTO CON IL BACK (da concordare col team): multipart/form-data con i campi
     // titolo, descrizione?, latitudine, longitudine, foto (file).
     // Il back valida il file, lo converte/salva e scrive l'url in segnalazione_immagini.

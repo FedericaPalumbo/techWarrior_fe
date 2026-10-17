@@ -30,14 +30,14 @@ export class LoginComponent {
     ngOnInit() {
         // Se l'utente è già autenticato non ha senso mostrare il login
         if (this.authSrv.isAuthenticated()) {
-            this.router.navigate(['/home']);
+            this.router.navigate(['/feed']);
         } else if (this.jwtSrv.hasToken()) {
             // Refresh della pagina: aspetto che l'utente venga caricato
             this.authSrv.fetchUser()
                 .pipe(takeUntilDestroyed(this.destroyRef))
                 .subscribe(user => {
                     if (user) {
-                        this.router.navigate(['/home']);
+                        this.router.navigate(['/feed']);
                     }
                 });
         }
@@ -53,14 +53,17 @@ export class LoginComponent {
             this.authSrv.login(email!, password!)
                 .pipe(
                     catchError(response => {
-                        const message = response.error?.message ?? 'Impossibile contattare il server, riprova più tardi.';
+                        // il backend limita i tentativi di accesso (10 al minuto)
+                        const message = response.status === 429
+                            ? 'Troppi tentativi di accesso, riprova tra un minuto.'
+                            : (response.error?.message ?? 'Impossibile contattare il server, riprova più tardi.');
                         this.errorMessage.set(message);
                         return throwError(() => response);
                     })
                 )
                 .subscribe(() => {
-                    const dest = this.activatedRoute.snapshot.queryParams['dest'] || '/home';
-                    this.router.navigate([dest]);
+                    const dest = this.activatedRoute.snapshot.queryParams['dest'] || '/feed';
+                    this.router.navigateByUrl(dest);
                 });
         }
     }

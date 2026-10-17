@@ -8,13 +8,13 @@
         <label for="iniziativa-titolo">Titolo</label>
         <input id="iniziativa-titolo" type="text" formControlName="titolo" maxlength="100">
         @if (iniziativaForm.controls.titolo.invalid && iniziativaForm.controls.titolo.touched) {
-        <p role="alert">Il titolo è obbligatorio</p>
+        <p role="alert">Il titolo è obbligatorio (almeno 3 caratteri)</p>
         }
     </div>
 
     <div>
         <label for="iniziativa-descrizione">Descrizione</label>
-        <textarea id="iniziativa-descrizione" formControlName="descrizione" rows="4"></textarea>
+        <textarea id="iniziativa-descrizione" formControlName="descrizione" rows="4" maxlength="2000"></textarea>
         @if (iniziativaForm.controls.descrizione.invalid && iniziativaForm.controls.descrizione.touched) {
         <p role="alert">La descrizione è obbligatoria</p>
         }
@@ -22,7 +22,7 @@
 
     <div>
         <label for="iniziativa-luogo">Luogo (facoltativo)</label>
-        <input id="iniziativa-luogo" type="text" formControlName="luogo">
+        <input id="iniziativa-luogo" type="text" formControlName="luogo" maxlength="255">
     </div>
 
     <div>
@@ -39,7 +39,7 @@
     </div>
 
     <div>
-        <label for="iniziativa-immagine">Immagine (facoltativa)</label>
+        <label for="iniziativa-immagine">Immagine (facoltativa, max 5 MB)</label>
         <input id="iniziativa-immagine" type="file" accept="image/png,image/jpeg,image/webp"
             (change)="onFileSelected($event)">
         @if (immagineErrore()) {

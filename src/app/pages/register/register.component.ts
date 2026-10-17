@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -14,6 +14,30 @@ const REQUIRED_MESSAGES: Record<string, string> = {
     confirmPassword: 'Conferma la tua password.'
 };
 
+const PASSWORD_MESSAGE = 'La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale (! @ # $ % ^ & *).';
+
+// Stesse regole del backend (create-user.dto.ts). Il backend a una password debole risponde solo
+// "Validation failed" senza dire perché: per questo le controllo anche qui, per spiegarlo all'utente.
+function passwordForte(control: AbstractControl): ValidationErrors | null {
+    const password: string = control.value ?? '';
+    if (!password) {
+        return null; // se è vuota se ne occupa Validators.required
+    }
+    const valida = password.length >= 8
+        && /[A-Z]/.test(password)
+        && /[a-z]/.test(password)
+        && /[0-9]/.test(password)
+        && /[!@#$%^&*]/.test(password);
+    return valida ? null : { passwordDebole: true };
+}
+
+// password e conferma devono coincidere (il backend lo controlla di nuovo, ma risponde solo "Validation failed")
+function passwordUguali(group: AbstractControl): ValidationErrors | null {
+    const password = group.get('password')?.value;
+    const conferma = group.get('confirmPassword')?.value;
+    return password && conferma && password !== conferma ? { passwordDiverse: true } : null;
+}
+
 @Component({
     selector: 'app-register',
     imports: [ReactiveFormsModule, RouterModule],
@@ -27,15 +51,14 @@ export class RegisterComponent {
     private router = inject(Router);
 
     // Nessun campo 'role': il backend registra ogni nuovo utente come 'cittadino'.
-    // Nessun controllo password === confirmPassword: lo fa il backend.
     registerForm = this.fb.group({
         firstName: ['', { validators: [Validators.required] }],
         lastName: ['', { validators: [Validators.required] }],
         // il pattern richiede anche il punto dopo la @ (Validators.email accetterebbe "mario@comune")
         email: ['', { validators: [Validators.required, Validators.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)] }],
-        password: ['', { validators: [Validators.required] }],
+        password: ['', { validators: [Validators.required, passwordForte] }],
         confirmPassword: ['', { validators: [Validators.required] }]
-    });
+    }, { validators: [passwordUguali] });
 
     errorMessage = signal<string | null>(null);
     // errori di un campo specifico restituiti dal backend (es. { email: 'Esiste già un account...' })
@@ -59,13 +82,22 @@ export class RegisterComponent {
         }
 
         const control = this.registerForm.get(name)!;
-        if (!control.touched || !control.errors) {
+        if (!control.touched) {
             return null;
         }
-        if (control.errors['required']) {
+        if (control.errors?.['required']) {
             return REQUIRED_MESSAGES[name];
         }
-        return 'Inserisci un\'email valida (es. nome@email.it).';
+        if (name === 'email' && control.errors?.['pattern']) {
+            return 'Inserisci un\'email valida (es. nome@email.it).';
+        }
+        if (name === 'password' && control.errors?.['passwordDebole']) {
+            return PASSWORD_MESSAGE;
+        }
+        if (name === 'confirmPassword' && this.registerForm.errors?.['passwordDiverse']) {
+            return 'Le due password non coincidono.';
+        }
+        return null;
     }
 
     register() {
@@ -83,17 +115,18 @@ export class RegisterComponent {
                     // così l'utente entra senza passare dalla pagina di login
                     switchMap(() => this.authSrv.login(email!, password!)),
                     catchError(response => {
-                        // 'UserExists' è l'errore previsto dal backend (400) quando l'email è già registrata
-                        if (response.error?.error === 'UserExists') {
+                        if (response.status === 409) {
+                            // il backend risponde 409 quando l'email è già registrata
                             this.serverErrors.set({ email: 'Esiste già un account con questa email.' });
+                        } else if (response.status === 429) {
+                            this.errorMessage.set('Troppi tentativi, riprova tra un minuto.');
                         } else {
-                            // include anche l'errore di "conferma password diversa" restituito dal backend
                             this.errorMessage.set(response.error?.message ?? 'Impossibile contattare il server, riprova più tardi.');
                         }
                         return throwError(() => response);
                     })
                 )
-                .subscribe(() => this.router.navigate(['/home']));
+                .subscribe(() => this.router.navigate(['/feed']));
         } else {
             // mostra subito gli errori di tutti i campi non validi
             this.registerForm.markAllAsTouched();
